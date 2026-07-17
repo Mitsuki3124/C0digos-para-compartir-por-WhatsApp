@@ -1,0 +1,61 @@
+# Códigos HTML de Amor para WhatsApp
+
+Proyecto de código abierto con plantillas HTML románticas y mensajes animados gratuitos para compartir en WhatsApp.
+
+## Contenido del Sitio
+
+El sitio aloja más de 37 plantillas HTML interactivas categorizadas en:
+
+- **Plantillas Románticas**: Vitaminas del Amor, Galaxia de Amor, Ramo de Flores, Mi Enojona
+- **Tarjetas Especiales**: Tarjeta Futbolista, Iniciales en Pareja, Te la Dedico
+- **Mensajes Interactivos**: Mensaje Raspa, Jardín de Amor Interactivo
+- **Contenido Temático**: Tarjetas Navideñas, Calendario de Adviento, Búsqueda del Tesoro
+- **Propuestas**: Quieres ser mi Novi@, Certificado del Amor
+
+## Información del Sitio
+
+**Desarrollador**: THORN ELDRITCH (Rayan)  
+**Repositorio**: [Códigos para Compartir por WhatsApp](https://c0digos-para-compartir-por-whatsapp.pages.dev/)  
+**Plataforma de Hosting**: Cloudflare Pages  
+**Lenguaje**: HTML5, CSS3, JavaScript Vanilla  
+
+## Características Principales
+
+- 37 plantillas HTML responsivas y compatibles con móviles
+- Código HTML descargable y personalizable
+- Mensajes animados con efectos interactivos
+- Diseño moderno con soporte para tema oscuro/claro
+- Integración con Google AdSense
+- Análisis de usuario vía Cloudflare Analytics
+- Cumplimiento de normativas: GDPR, Política de Privacidad, Términos de Servicio
+
+## Política de Cookies
+
+El sitio utiliza cookies funcionales, de seguridad, personalización y analíticas. Los usuarios pueden configurar sus preferencias de cookies mediante el banner de consentimiento disponible en el sitio.
+
+## Seguridad
+
+- Headers HTTP de seguridad: CSP, HSTS, X-Frame-Options
+- Certificado SSL/TLS (HTTPS obligatorio)
+- Cloudflare Worker para protección adicional
+- Validación de entrada en formularios
+
+## Métodos de Contacto
+
+Para consultas sobre privacidad o contenido, contacta a través del formulario de contacto disponible en la sección de Contacto del sitio.
+
+## Licencia
+
+Las plantillas HTML se proporcionan de forma gratuita para uso personal y educativo. Verifica los términos de servicio completos en: [https://c0digos-para-compartir-por-whatsapp.pages.dev/](https://c0digos-para-compartir-por-whatsapp.pages.dev/)
+
+## Accesibilidad
+
+El sitio implementa estándares WCAG 2.1 Level AA:
+- Navegación mediante teclado
+- Etiquetas ARIA para lectores de pantalla
+- Contraste de colores accesible
+- Skip links para contenido principal
+
+---
+
+*Última actualización: Julio 2026*

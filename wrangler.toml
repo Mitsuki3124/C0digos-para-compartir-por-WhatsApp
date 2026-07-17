@@ -1,0 +1,14 @@
+name = "c0digos-para-compartir-por-whatsapp"
+type = "javascript"
+main = "src/index.js"
+compatibility_date = "2024-12-19"
+
+[env.production]
+routes = [
+  { pattern = "c0digos-para-compartir-por-whatsapp.pages.dev", zone_name = "c0digos-para-compartir-por-whatsapp.pages.dev" }
+]
+
+[build]
+command = "npm run build"
+cwd = "./"
+watch_paths = ["index.html", "wallpapers/**", "_headers", "robots.txt", "sitemap.xml"]
