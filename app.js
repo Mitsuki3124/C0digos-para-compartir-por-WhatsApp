@@ -1096,129 +1096,230 @@ const ModalManager = {
         // GALERÍA DE FONDOS DE PANTALLA EN MODAL
 
         // CONFIGURACIÓN AUTOMÁTICA DE FONDOS DE PANTALLA
-        // ✅ MANTENIMIENTO: Para añadir más fondos, solo cambia este número:
-        // Ejemplo: fondo43 → cambia TOTAL_FONDOS a 43
-        //          fondo50 → cambia TOTAL_FONDOS a 50
-        //          fondo100 → cambia TOTAL_FONDOS a 100
-        const TOTAL_FONDOS = 42;
+        // ========================================
+// DETECCIÓN AUTOMÁTICA DE SOPORTE WEBP
+// ========================================
+// Este código detecta si el navegador soporta WebP
+// Si soporta: usa .webp (más pequeño, mejor compresión)
+// Si NO soporta: usa .jpg automáticamente (sin que hagas nada)
+const extensionSoportada = (() => {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  // Test simple pero confiable para WebP
+  try {
+    const webpData = canvas.toDataURL('image/webp');
+    return webpData.indexOf('data:image/webp') === 0 ? 'webp' : 'jpg';
+  } catch {
+    return 'jpg';
+  }
+})();
 
-        // Ruta base donde están las imágenes (subcarpeta wallpapers/)
-        const WALLPAPERS_PATH = './wallpapers/';
+console.log(`✅ Extensión detectada: ${extensionSoportada}`);
 
-        // Variable global para controlar carga única de wallpapers
-        let wallpapersLoaded = false;
+// ========================================
+// SECCIÓN A REEMPLAZAR EN TU app.js
+// Líneas aproximadamente 1099–1220
+// ========================================
 
-        // FUNCIÓN AUTOMÁTICA DE CARGA DE GALERÍA
-        // Genera las 42 tarjetas con un bucle for
-        // SIN arrays manuales ni código repetitivo
-        function loadWallpapers() {
-            const grid = document.getElementById('wallpapersGrid');
-            const noWallpapers = document.getElementById('noWallpapers');
+// ✅ MANTENIMIENTO: Para añadir más fondos, solo cambia este número:
+// Ejemplo: fondo43 → cambia TOTAL_FONDOS a 43
+//          fondo50 → cambia TOTAL_FONDOS a 50
+//          fondo100 → cambia TOTAL_FONDOS a 100
+const TOTAL_FONDOS = 42; // ← CAMBIAR AQUÍ si añades más
 
-            if (!grid) return;
+// Ruta base donde están las imágenes (subcarpeta wallpapers/)
+const WALLPAPERS_PATH = './wallpapers/';
 
-            // Si ya se cargaron una vez, no recargar
-            if (wallpapersLoaded) {
-                console.log('ℹ️ Wallpapers ya cargados, omitiendo recarga');
-                return;
-            }
+// Variable global para controlar carga única de wallpapers
+let wallpapersLoaded = false;
 
-            if (TOTAL_FONDOS === 0) {
-                noWallpapers.style.display = 'block';
-                grid.style.display = 'none';
-                return;
-            }
+// ========================================
+// CARGAR GALERÍA DE FONDOS (CON LAZY LOAD)
+// ========================================
+function loadWallpapersGrid() {
+  if (typeof DOM === 'undefined') return;
 
-            grid.innerHTML = '';
-            noWallpapers.style.display = 'none';
-            grid.style.display = 'grid';
+  const grid = document.getElementById('wallpapersGrid');
+  
+  if (grid && !wallpapersLoaded) {
+    
+    if (wallpapersLoaded) {
+      return;
+    }
 
-            // ✅ BUCLE FOR: genera dinámicamente las TOTAL_FONDOS tarjetas
-            // sin necesidad de ningún array escrito a mano
-            for (let i = 1; i <= TOTAL_FONDOS; i++) {
-                // Se usa let para que el closure capture el valor correcto de i en cada iteración
-                const imagePath     = WALLPAPERS_PATH + 'fondo' + i + '.jpg';
-                const wallpaperTitle = 'Fondo Romántico ' + i;
-                const fileName       = 'fondo' + i + '.jpg';
+    // Limpiar grid anterior si existe
+    grid.innerHTML = '';
 
-                const card = document.createElement('div');
-                card.className = 'wallpaper-card skeleton';
+    // Crear tarjetas para cada fondo
+    for (let i = 1; i <= TOTAL_FONDOS; i++) {
+      // ⭐ AQUÍ ESTÁ LA MAGIA: construye la ruta con la extensión soportada
+      const imagePath     = WALLPAPERS_PATH + 'fondo' + i + '.' + extensionSoportada;
+      const wallpaperTitle = 'Fondo Romántico ' + i;
+      const fileName       = 'fondo' + i + '.' + extensionSoportada; // ← También aquí
 
-                // ✅ BOTÓN DESCARGAR → <a> con atributo HTML5 "download"
-                //    Descarga directa al almacenamiento del móvil sin servidores externos.
-                //
-                // ✅ BOTÓN VER → <button> que llama a viewWallpaper()
-                //    Abre el modal personalizado de THORN ELDRITCH con la imagen
-                //    ampliada y el botón "Descargar fondo de pantalla" en la parte inferior.
-                //
-                // ✅ CLICK EN LA IMAGEN Y EN LA TARJETA → también abre el modal
-                card.innerHTML =
-                    '<img data-src="' + imagePath + '"' +
-                        ' alt="' + wallpaperTitle + '"' +
-                        ' class="wallpaper-image"' +
-                        ' loading="lazy"' +
-                        ' decoding="async">' +
-                    '<div class="wallpaper-info">' +
-                        '<div class="wallpaper-title">' + wallpaperTitle + '</div>' +
-                        '<div class="wallpaper-actions">' +
-                            '<a href="' + imagePath + '"' +
-                               ' download="' + fileName + '"' +
-                               ' class="wallpaper-btn wallpaper-download">' +
-                                '📥 Descargar' +
-                            '</a>' +
-                            '<button type="button"' +
-                               ' class="wallpaper-btn wallpaper-view">' +
-                                '👁️ Ver' +
-                            '</button>' +
-                        '</div>' +
-                    '</div>';
+      const card = document.createElement('div');
+      card.className = 'wallpaper-card skeleton';
 
-                // Botón VER → abre el modal personalizado
-                const viewBtn = card.querySelector('.wallpaper-view');
-                viewBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    viewWallpaper(imagePath, wallpaperTitle);
-                });
+      // Structure: Imagen + info (título, botones)
+      // Usa data-src para lazy loading, no src directo
+      card.innerHTML = 
+        '<div class="wallpaper-image-wrapper">' +
+          '<img ' +
+            'data-src="' + imagePath + '" ' +
+            'alt="' + wallpaperTitle + '" ' +
+            'class="wallpaper-image"' +
+          '>' +
+        '</div>' +
+        '<div class="wallpaper-info">' +
+          '<div class="wallpaper-title">' + wallpaperTitle + '</div>' +
+          '<div class="wallpaper-actions">' +
+            '<button class="wallpaper-btn wallpaper-download" title="Descargar">⬇️ Descargar</button> ' +
+            '<button class="wallpaper-btn wallpaper-view" title="Ver grande">🔍 Ver</button>' +
+          '</div>' +
+        '</div>';
 
-                // Botón DESCARGAR → stopPropagation para evitar que active el modal
-                const dlBtn = card.querySelector('.wallpaper-download');
-                dlBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                });
+      grid.appendChild(card);
 
-                // Click en la imagen → abre el modal
-                const img = card.querySelector('.wallpaper-image');
-                img.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    viewWallpaper(imagePath, wallpaperTitle);
-                });
+      // Event listener: Ver fondo de pantalla
+      const viewBtn = card.querySelector('.wallpaper-view');
+      if (viewBtn) {
+        viewBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          viewWallpaper(imagePath, wallpaperTitle);
+        });
+      }
 
-                // Click en cualquier parte de la tarjeta → abre el modal
-                // (excepto si se hizo click en el enlace de descarga o en el botón ver,
-                //  que ya tienen su propio listener con stopPropagation)
-                card.addEventListener('click', () => {
-                    viewWallpaper(imagePath, wallpaperTitle);
-                });
+      // Event listener: Descargar fondo
+      const dlBtn = card.querySelector('.wallpaper-download');
+      if (dlBtn) {
+        dlBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          downloadWallpaper(imagePath, fileName);
+        });
+      }
 
-                grid.appendChild(card);
-            }
+      // Click en la tarjeta también abre el fondo
+      const img = card.querySelector('.wallpaper-image');
+      if (img) {
+        img.addEventListener('click', function() {
+          viewWallpaper(imagePath, wallpaperTitle);
+        });
+        
+        // Loading skeleton mientras se descarga
+        img.addEventListener('load', function() {
+          card.classList.remove('skeleton');
+        });
+      }
+    }
 
-            // Marcar como cargado
-            wallpapersLoaded = true;
+    wallpapersLoaded = true;
 
-            ToastSystem.info('Cargando ' + TOTAL_FONDOS + ' fondos de pantalla...', 'Galería');
+    // Toast de info
+    if (typeof ToastSystem !== 'undefined') {
+      ToastSystem.info('Cargando ' + TOTAL_FONDOS + ' fondos de pantalla...', 'Galería');
+    }
 
-            // Esperar a que LazyLoader esté listo antes de observar imágenes
-            requestAnimationFrame(() => {
-                const modalImages = document.querySelectorAll('#wallpapersGrid img[data-src]');
-                modalImages.forEach(img => {
-                    LazyLoader.observeImage(img);
-                });
-            });
+    // Lazy load las imágenes
+    if (typeof LazyLoader !== 'undefined') {
+      const modalImages = document.querySelectorAll('#wallpapersGrid img[data-src]');
+      LazyLoader.lazyLoad(modalImages);
+    }
 
-            // Precargar primera imagen
-            LazyLoader.preloadImages([WALLPAPERS_PATH + 'fondo1.jpg']);
-        }
+    // Precargar primer fondo
+    if (typeof LazyLoader !== 'undefined') {
+      LazyLoader.preloadImages([WALLPAPERS_PATH + 'fondo1.' + extensionSoportada]);
+    }
+  }
+}
+
+// ========================================
+// DESCARGAR FONDO DE PANTALLA
+// ========================================
+function downloadWallpaper(url, title) {
+  if (!url) {
+    if (typeof ToastSystem !== 'undefined') {
+      ToastSystem.error('Este fondo no está disponible ahora mismo', '⚠️ No encontrado');
+    }
+    return;
+  }
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = title || 'fondo';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  if (typeof ToastSystem !== 'undefined') {
+    ToastSystem.success('Descargando: ' + title, '✅ Descarga');
+  }
+}
+
+// ========================================
+// VER FONDO DE PANTALLA EN MODAL
+// ========================================
+function viewWallpaper(url, title) {
+  if (!url) {
+    if (typeof ToastSystem !== 'undefined') {
+      ToastSystem.error('Este fondo no está disponible ahora mismo', '⚠️ No encontrado');
+    }
+    return;
+  }
+
+  const modal = document.getElementById('wallpaperViewModal') || 
+                document.getElementById('wallpapersModal');
+
+  if (modal) {
+    // Aquí va tu HTML del modal
+    // Ejemplo básico:
+    modal.innerHTML = `
+      <div class="modal-content wallpaper-modal-content">
+        <span class="close-modal" onclick="this.closest('[id*=Modal]').style.display='none'">&times;</span>
+        <div class="wallpaper-view-container">
+          <img src="${url}" alt="${title}" class="wallpaper-view-image">
+          <div class="wallpaper-view-info">
+            <h2>${title}</h2>
+            <button class="btn btn-primary" onclick="downloadWallpaper('${url}', '${title}')">
+              ⬇️ Descargar fondo de pantalla
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    modal.style.display = 'block';
+  } else {
+    if (typeof ToastSystem !== 'undefined') {
+      ToastSystem.error('Este fondo de pantalla no pudo cargarse', '⚠️ Error modal');
+    }
+  }
+}
+
+// ========================================
+// EJECUTAR CUANDO HAGAS CLIC EN "VER FONDOS"
+// ========================================
+// Busca dónde en tu código se llama loadWallpapersGrid() y 
+// asegúrate de que se ejecute cuando abres el modal de fondos
+
+// Ejemplo:
+document.addEventListener('DOMContentLoaded', function() {
+  const menuWallpapers = document.getElementById('wallpapersBtn') || 
+                          document.querySelector('[data-tab="wallpapers"]');
+  
+  if (menuWallpapers) {
+    menuWallpapers.addEventListener('click', function() {
+      loadWallpapersGrid();
+      
+      // Si tienes modal, muéstralo
+      const modal = document.getElementById('wallpapersModal');
+      if (modal) {
+        modal.style.display = 'block';
+      }
+    });
+  }
+});
 
         // Función para descargar fondo de pantalla
         function downloadWallpaper(imagePath, title) {
