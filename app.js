@@ -1096,24 +1096,6 @@ const ModalManager = {
         // GALERÍA DE FONDOS DE PANTALLA EN MODAL
 
         // CONFIGURACIÓN AUTOMÁTICA DE FONDOS DE PANTALLA
-        // ========================================
-        // DETECCIÓN AUTOMÁTICA DE SOPORTE WEBP
-        // ========================================
-        // Este código detecta si el navegador soporta WebP
-        // Si soporta: usa .webp (más pequeño, mejor compresión)
-        // Si NO soporta: usa .jpg automáticamente (sin que hagas nada)
-        const extensionSoportada = (() => {
-          const canvas = document.createElement('canvas');
-          try {
-            const webpData = canvas.toDataURL('image/webp');
-            return webpData.indexOf('data:image/webp') === 0 ? 'webp' : 'jpg';
-          } catch {
-            return 'jpg';
-          }
-        })();
-
-        console.log(`✅ Extensión de imagen detectada: ${extensionSoportada}`);
-
         // ✅ MANTENIMIENTO: Para añadir más fondos, solo cambia este número:
         // Ejemplo: fondo43 → cambia TOTAL_FONDOS a 43
         //          fondo50 → cambia TOTAL_FONDOS a 50
@@ -1155,10 +1137,9 @@ const ModalManager = {
             // sin necesidad de ningún array escrito a mano
             for (let i = 1; i <= TOTAL_FONDOS; i++) {
                 // Se usa let para que el closure capture el valor correcto de i en cada iteración
-                // ⭐ AQUÍ ESTÁ LA MAGIA: construye la ruta con la extensión soportada
-                const imagePath     = WALLPAPERS_PATH + 'fondo' + i + '.' + extensionSoportada;
+                const imagePath     = WALLPAPERS_PATH + 'fondo' + i + '.jpg';
                 const wallpaperTitle = 'Fondo Romántico ' + i;
-                const fileName       = 'fondo' + i + '.' + extensionSoportada;
+                const fileName       = 'fondo' + i + '.jpg';
 
                 const card = document.createElement('div');
                 card.className = 'wallpaper-card skeleton';
@@ -1235,8 +1216,8 @@ const ModalManager = {
                 });
             });
 
-            // Precargar primera imagen (con extensión automática)
-            LazyLoader.preloadImages([WALLPAPERS_PATH + 'fondo1.' + extensionSoportada]);
+            // Precargar primera imagen
+            LazyLoader.preloadImages([WALLPAPERS_PATH + 'fondo1.jpg']);
         }
 
         // Función para descargar fondo de pantalla
