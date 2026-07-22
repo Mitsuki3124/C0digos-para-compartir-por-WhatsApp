@@ -1137,10 +1137,7 @@ const ModalManager = {
             // sin necesidad de ningún array escrito a mano
             for (let i = 1; i <= TOTAL_FONDOS; i++) {
                 // Se usa let para que el closure capture el valor correcto de i en cada iteración
-                const baseFileName   = 'fondo' + i;
-                const avifPath       = WALLPAPERS_PATH + baseFileName + '.avif';
-                const webpPath       = WALLPAPERS_PATH + baseFileName + '.webp';
-                const jpgPath        = WALLPAPERS_PATH + baseFileName + '.jpg';
+                const imagePath     = WALLPAPERS_PATH + 'fondo' + i + '.jpg';
                 const wallpaperTitle = 'Fondo Romántico ' + i;
                 const fileName       = 'fondo' + i + '.jpg';
 
@@ -1155,20 +1152,16 @@ const ModalManager = {
                 //    ampliada y el botón "Descargar fondo de pantalla" en la parte inferior.
                 //
                 // ✅ CLICK EN LA IMAGEN Y EN LA TARJETA → también abre el modal
-                card.innerHTML = `
-                    <picture>
-                        <source srcset="${avifPath}" type="image/avif">
-                        <source srcset="${webpPath}" type="image/webp">
-                        <img data-src="${jpgPath}"
-                             alt="${wallpaperTitle}"
-                             class="wallpaper-image"
-                             loading="lazy"
-                             decoding="async">
-                    </picture>
+                card.innerHTML =
+                    '<img data-src="' + imagePath + '"' +
+                        ' alt="' + wallpaperTitle + '"' +
+                        ' class="wallpaper-image"' +
+                        ' loading="lazy"' +
+                        ' decoding="async">' +
                     '<div class="wallpaper-info">' +
                         '<div class="wallpaper-title">' + wallpaperTitle + '</div>' +
                         '<div class="wallpaper-actions">' +
-                            '<a href="' + jpgPath + '"' +
+                            '<a href="' + imagePath + '"' +
                                ' download="' + fileName + '"' +
                                ' class="wallpaper-btn wallpaper-download">' +
                                 '📥 Descargar' +
@@ -1184,7 +1177,7 @@ const ModalManager = {
                 const viewBtn = card.querySelector('.wallpaper-view');
                 viewBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    viewWallpaper(jpgPath, wallpaperTitle); // Usar JPG como referencia para la vista
+                    viewWallpaper(imagePath, wallpaperTitle);
                 });
 
                 // Botón DESCARGAR → stopPropagation para evitar que active el modal
@@ -1197,14 +1190,14 @@ const ModalManager = {
                 const img = card.querySelector('.wallpaper-image');
                 img.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    viewWallpaper(jpgPath, wallpaperTitle);
+                    viewWallpaper(imagePath, wallpaperTitle);
                 });
 
                 // Click en cualquier parte de la tarjeta → abre el modal
                 // (excepto si se hizo click en el enlace de descarga o en el botón ver,
                 //  que ya tienen su propio listener con stopPropagation)
                 card.addEventListener('click', () => {
-                    viewWallpaper(jpgPath, wallpaperTitle);
+                    viewWallpaper(imagePath, wallpaperTitle);
                 });
 
                 grid.appendChild(card);
