@@ -1137,9 +1137,10 @@ const ModalManager = {
             // sin necesidad de ningún array escrito a mano
             for (let i = 1; i <= TOTAL_FONDOS; i++) {
                 // Se usa let para que el closure capture el valor correcto de i en cada iteración
-                const imagePath     = WALLPAPERS_PATH + 'fondo' + i + '.jpg';
+                const ext = (i === 1) ? 'webp' : 'jpg';
+                const imagePath     = WALLPAPERS_PATH + 'fondo' + i + '.' + ext;
                 const wallpaperTitle = 'Fondo Romántico ' + i;
-                const fileName       = 'fondo' + i + '.jpg';
+                const fileName       = 'fondo' + i + '.' + ext;
 
                 const card = document.createElement('div');
                 card.className = 'wallpaper-card skeleton';
@@ -1222,7 +1223,8 @@ const ModalManager = {
 
         // Función para descargar fondo de pantalla
         function downloadWallpaper(imagePath, title) {
-    const fileName = (title || 'fondo').replace(/\s+/g, '_') + '.jpg';
+    const extension = imagePath.split('.').pop();
+    const fileName = (title || 'fondo').replace(/\s+/g, '_') + '.' + extension;
 
     // Aviso inicial
     ToastSystem.info('Preparando descarga...', '📥 Descargando');
