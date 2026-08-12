@@ -4,6 +4,7 @@
   "description": "Códigos HTML de Amor - Plantillas Románticas para WhatsApp",
   "author": "THORN ELDRITCH",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "build": "echo 'Static site - no build needed'",
     "dev": "wrangler pages dev",
