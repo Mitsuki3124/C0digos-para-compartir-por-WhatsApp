@@ -1,40 +1,34 @@
-# Robots.txt para Códigos para Compartir por WhatsApp
-# Política de indexación para motores de búsqueda
+# Robots.txt para Codigos para Compartir por WhatsApp
+# Politica de indexacion para motores de busqueda
 
-# Permitir a todos los bots
 User-agent: *
 Allow: /
 Allow: /wallpapers/
 Allow: /sitemap.xml
+Allow: /*?q=
+Allow: /*?filter=
 
-# Desindexar archivos de configuración
+# Evitar indexacion de archivos internos o de configuracion
 Disallow: /netlify.toml
+Disallow: /wrangler.toml
 Disallow: /.netlify/
 Disallow: /.git/
+Disallow: /.agents/
+Disallow: /.vscode/
 Disallow: /node_modules/
-Disallow: /*?*=*  # Parámetros de consulta (evita duplicados)
 
-# Google Bot optimización
+# Evitar duplicados por parametros no controlados
+Disallow: /*?*=*
+
 User-agent: Googlebot
 Allow: /
-Crawl-delay: 0
+Allow: /*?q=
+Allow: /*?filter=
 
-# Bing Bot
 User-agent: Bingbot
 Allow: /
+Allow: /*?q=
+Allow: /*?filter=
 Crawl-delay: 1
 
-# DuckDuckGo
-User-agent: DuckDuckBot
-Allow: /
-Crawl-delay: 0
-
-# Baidu (China)
-User-agent: Baiduspider
-Allow: /wallpapers/
-
-# Apunta al sitemap XML
-Sitemap: https://codigosparacompartirporwhats.netlify.app/sitemap.xml
-
-# Tiempo de respuesta máximo recomendado
-Request-rate: 1/1s
+Sitemap: https://c0digos-para-compartir-por-whatsapp.pages.dev/sitemap.xml

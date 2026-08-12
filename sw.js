@@ -1,7 +1,7 @@
 // Service Worker: Caching strategy for third-party resources
 // Cache terceros (Google Ads, Cloudflare Analytics) con TTL de 14 días
 
-const CACHE_NAME = 'c0digos-v5';
+const CACHE_NAME = 'c0digos-v6';
 const THIRD_PARTY_CACHE = 'third-party-v1';
 const CACHE_DURATION = 14 * 24 * 60 * 60 * 1000; // 14 días en ms
 

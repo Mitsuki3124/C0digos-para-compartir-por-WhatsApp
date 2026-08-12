@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0">
-
-    <!-- Página principal -->
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
     <url>
-        <loc>https://codigosparacompartirporwhats.netlify.app/</loc>
-        <lastmod>2026-06-25</lastmod>
+        <loc>https://c0digos-para-compartir-por-whatsapp.pages.dev/</loc>
+        <lastmod>2026-08-12</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
         <image:image>
-            <image:loc>https://codigosparacompartirporwhats.netlify.app/wallpapers/fondo1.webp</image:loc>
-            <image:title>Plantillas HTML Románticas para WhatsApp – Fondo 1</image:title>
-            <image:caption>Fondo de pantalla romántico para WhatsApp</image:caption>
+            <image:loc>https://c0digos-para-compartir-por-whatsapp.pages.dev/preview.jpg</image:loc>
+            <image:title>Codigos HTML de Amor</image:title>
+            <image:caption>Plantillas HTML romanticas gratis para WhatsApp</image:caption>
         </image:image>
         <image:image>
-            <image:loc>https://codigosparacompartirporwhats.netlify.app/wallpapers/fondo2.jpg</image:loc>
-            <image:title>Fondo romántico 2</image:title>
+            <image:loc>https://c0digos-para-compartir-por-whatsapp.pages.dev/wallpapers/fondo1.webp</image:loc>
+            <image:title>Fondo romantico 1</image:title>
+            <image:caption>Fondo de pantalla romantico para movil</image:caption>
         </image:image>
         <image:image>
-            <image:loc>https://codigosparacompartirporwhats.netlify.app/wallpapers/fondo3.jpg</image:loc>
-            <image:title>Fondo romántico 3</image:title>
+            <image:loc>https://c0digos-para-compartir-por-whatsapp.pages.dev/wallpapers/fondo2.jpg</image:loc>
+            <image:title>Fondo romantico 2</image:title>
         </image:image>
-        <mobile:mobile/>
+        <image:image>
+            <image:loc>https://c0digos-para-compartir-por-whatsapp.pages.dev/wallpapers/fondo3.jpg</image:loc>
+            <image:title>Fondo romantico 3</image:title>
+        </image:image>
     </url>
-
 </urlset>
