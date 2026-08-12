@@ -12,6 +12,59 @@ const debouncedSearch = debounce((value) => {
     filterTemplates();
 }, 300);
 
+function replaceChildrenSafe(element, children) {
+    element.textContent = '';
+    children.forEach(child => element.appendChild(child));
+}
+
+function createNoResultsMessage(title, description) {
+    const fragment = document.createDocumentFragment();
+    const h3 = document.createElement('h3');
+    const p = document.createElement('p');
+
+    h3.textContent = title;
+    p.textContent = description;
+    fragment.append(h3, p);
+
+    return fragment;
+}
+
+function createSearchNoResultsMessage(searchTerm) {
+    const fragment = document.createDocumentFragment();
+    const h3 = document.createElement('h3');
+    const p = document.createElement('p');
+
+    h3.append(
+        document.createTextNode('😔 No encontramos resultados para "'),
+        document.createTextNode(searchTerm),
+        document.createTextNode('"')
+    );
+    p.textContent = 'Intenta con otros términos de búsqueda o cambia el filtro';
+    fragment.append(h3, p);
+
+    return fragment;
+}
+
+function updateSearchStats(visibleCount, filterText) {
+    DOM.searchStats.textContent = '';
+    DOM.searchStats.append(document.createTextNode('Mostrando '));
+
+    const countSpan = document.createElement('span');
+    countSpan.id = 'resultsCount';
+    countSpan.textContent = String(visibleCount);
+    DOM.searchStats.append(countSpan);
+
+    DOM.searchStats.append(document.createTextNode(' plantillas' + filterText));
+
+    if (currentSearch) {
+        DOM.searchStats.append(
+            document.createTextNode(' para "'),
+            document.createTextNode(currentSearch),
+            document.createTextNode('"')
+        );
+    }
+}
+
 // SISTEMA DE BÚSQUEDA Y FILTROS OPTIMIZADO
 // Nota: Ahora usamos DOM.codeCards, DOM.searchInput, etc.
 // El caché se inicializa en DOMContentLoaded
@@ -84,14 +137,23 @@ export function filterTemplates() {
     if (visibleCount === 0) {
         // Mensaje especial para favoritos vacíos
         if (currentFilter === 'favorites') {
-            DOM.noResults.innerHTML = '<h3>⭐ No tienes favoritos aún</h3><p>Haz clic en la estrella ☆ de las plantillas que te gusten para guardarlas aquí</p>';
+            replaceChildrenSafe(DOM.noResults, [
+                createNoResultsMessage(
+                    '⭐ No tienes favoritos aún',
+                    'Haz clic en la estrella ☆ de las plantillas que te gusten para guardarlas aquí'
+                )
+            ]);
         } else if (currentSearch) {
-            // MEJOR ENFOQUE: Construir con textContent para user input
-            DOM.noResults.innerHTML = '<h3>😔 No encontramos resultados para "<span id="search-term"></span>"</h3><p>Intenta con otros términos de búsqueda o cambia el filtro</p>';
-            // Insertar búsqueda del usuario SEGURO con textContent
-            document.getElementById('search-term').textContent = currentSearch;
+            replaceChildrenSafe(DOM.noResults, [
+                createSearchNoResultsMessage(currentSearch)
+            ]);
         } else {
-            DOM.noResults.innerHTML = '<h3>😔 No hay plantillas en esta categoría</h3><p>Intenta con otro filtro</p>';
+            replaceChildrenSafe(DOM.noResults, [
+                createNoResultsMessage(
+                    '😔 No hay plantillas en esta categoría',
+                    'Intenta con otro filtro'
+                )
+            ]);
         }
     }
     
@@ -117,16 +179,7 @@ export function filterTemplates() {
             filterText = '';
     }
     
-    // MEJOR ENFOQUE: Separar HTML real de user input
-    DOM.searchStats.innerHTML = `Mostrando <span id="resultsCount">${visibleCount}</span> plantillas${filterText}${currentSearch ? ' para "<span id="stats-search"></span>"' : ''}`;
-    
-    // Insertar búsqueda SEGURO si existe
-    if (currentSearch) {
-        const statsSearch = document.getElementById('stats-search');
-        if (statsSearch) {
-            statsSearch.textContent = currentSearch;
-        }
-    }
+    updateSearchStats(visibleCount, filterText);
     
     // Las animaciones funcionan sin necesidad de forzar reflows en navegadores modernos
 }

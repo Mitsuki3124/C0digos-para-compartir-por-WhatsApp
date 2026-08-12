@@ -51,7 +51,7 @@ export default {
       font-src 'self' data: https://fonts.gstatic.com;
       connect-src 'self' https:;
       frame-src https://pagead2.googlesyndication.com;
-      frame-ancestors 'self';
+      frame-ancestors 'none';
       base-uri 'self';
       form-action 'self';
       object-src 'none';
@@ -63,7 +63,7 @@ export default {
     // Headers de seguridad adicionales
     newResponse.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
     newResponse.headers.set('X-Content-Type-Options', 'nosniff');
-    newResponse.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    newResponse.headers.set('X-Frame-Options', 'DENY');
     newResponse.headers.set('X-XSS-Protection', '1; mode=block');
     newResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     newResponse.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), fullscreen=(self)');

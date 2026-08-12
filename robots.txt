@@ -31,4 +31,13 @@ Allow: /*?q=
 Allow: /*?filter=
 Crawl-delay: 1
 
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
 Sitemap: https://c0digos-para-compartir-por-whatsapp.pages.dev/sitemap.xml
