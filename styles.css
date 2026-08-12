@@ -173,3 +173,55 @@
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
 }
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 15px;
+    }
+
+    .container {
+        padding: 14px;
+    }
+
+    .banner-content h1 {
+        font-size: 1.65em;
+        line-height: 1.25;
+    }
+
+    .subtitle {
+        font-size: 1.05em;
+    }
+
+    .code-title {
+        font-size: 1.28em;
+    }
+
+    .code-description,
+    .description p,
+    .step-description {
+        font-size: 0.95em;
+        line-height: 1.55;
+    }
+
+    .how-to-section h2 {
+        font-size: 1.55em;
+    }
+
+    .share-section h3,
+    .download-guides h3 {
+        font-size: 1.35em;
+    }
+
+    .modal-content h2 {
+        font-size: 1.45em;
+    }
+
+    .modal-content h3 {
+        font-size: 1.22em;
+    }
+}
