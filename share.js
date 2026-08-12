@@ -223,16 +223,15 @@ export const ModalManager = {
 
         // Ruta base donde están las imágenes (subcarpeta wallpapers/)
         const WALLPAPERS_PATH = './wallpapers/';
-        const WALLPAPER_FORMATS = {
-            1: 'webp'
-        };
+        const WALLPAPER_DEFAULT_FORMAT = 'webp';
+        const WALLPAPER_FORMATS = {};
         const WALLPAPER_RESPONSIVE = {
             // Ejemplo futuro:
             // 19: ['fondo19-480w.webp 480w', 'fondo19-800w.webp 800w', 'fondo19.webp 1200w']
         };
 
         function getWallpaperAsset(index) {
-            const ext = WALLPAPER_FORMATS[index] || 'jpg';
+            const ext = WALLPAPER_FORMATS[index] || WALLPAPER_DEFAULT_FORMAT;
             const fileName = 'fondo' + index + '.' + ext;
             const responsiveSet = WALLPAPER_RESPONSIVE[index] || [];
 
