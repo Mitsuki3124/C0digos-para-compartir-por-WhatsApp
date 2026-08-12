@@ -80,15 +80,15 @@ export const LazyLoader = {
                 return;
             }
 
-            this.observer = new IntersectionObserver((entries) => {
+            this.observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         this.loadImage(entry.target);
-                        this.observer.unobserve(entry.target);
+                        observer.unobserve(entry.target);
                     }
                 });
             }, {
-                rootMargin: '100px 0px',
+                rootMargin: '50px 0px',
                 threshold: 0.01
             });
 
@@ -130,6 +130,8 @@ export const LazyLoader = {
 
     loadImage(img) {
         const src = img.getAttribute('data-src');
+        const srcset = img.getAttribute('data-srcset');
+        const sizes = img.getAttribute('data-sizes');
         if (!src) return;
 
         // Añadir clase loading
@@ -169,6 +171,14 @@ export const LazyLoader = {
         }, { once: true });
 
         // Comenzar a cargar la imagen
+        if (srcset) {
+            img.srcset = srcset;
+            img.removeAttribute('data-srcset');
+        }
+        if (sizes) {
+            img.sizes = sizes;
+            img.removeAttribute('data-sizes');
+        }
         img.src = src;
         img.removeAttribute('data-src');
     },

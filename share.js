@@ -280,7 +280,7 @@ export const ModalManager = {
                 const wallpaperTitle = 'Fondo Romántico ' + i;
                 const fileName       = wallpaperAsset.fileName;
                 const responsiveAttrs = wallpaperAsset.srcset
-                    ? '" srcset="' + wallpaperAsset.srcset + '" sizes="(max-width: 600px) 480px, (max-width: 1200px) 800px, 1200px'
+                    ? '" data-srcset="' + wallpaperAsset.srcset + '" data-sizes="(max-width: 600px) 480px, (max-width: 1200px) 800px, 1200px'
                     : '';
 
                 const card = document.createElement('div');
