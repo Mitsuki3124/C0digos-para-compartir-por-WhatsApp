@@ -1,6 +1,6 @@
 name: Mi Workflow
 on: [push]
-
+ 
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -9,4 +9,5 @@ jobs:
       - name: Usar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'  # ← Aquí está el cambio
+          node-version: '22.x'
+ 
