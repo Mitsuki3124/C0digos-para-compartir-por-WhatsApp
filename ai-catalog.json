@@ -1,0 +1,8 @@
+"ai-capabilities": {
+  "discovery": {
+    "indexable": true,
+    "crawlable": true,
+    "sitemap": "sitemap.xml",
+    "robots": "robots.txt"
+  }
+}
