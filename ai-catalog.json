@@ -1,189 +1,70 @@
 {
-  "version": "1.0.0",
-  "name": "C0digos-para-compartir-por-WhatsApp",
-  "displayName": "Códigos HTML de Amor - Plantillas Románticas",
-  "description": "Galería de fondos románticos con soporte WebP y JPG fallback. Colección de plantillas HTML para compartir por WhatsApp.",
-  "license": "MIT",
-  "author": {
-    "name": "THORN ELDRITCH",
-    "url": "https://github.com/Mitsuki3124"
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Códigos HTML de Amor",
+    "documentationUrl": "https://c0digos-para-compartir-por-whatsapp.pages.dev/"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Mitsuki3124/C0digos-para-compartir-por-WhatsApp"
-  },
-  "homepage": "https://c0digos-para-compartir-por-whatsapp.pages.dev",
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "manifest": {
-    "type": "web-application",
-    "platform": "cloudflare-pages",
-    "entryPoint": "index.html",
-    "assets": {
-      "wallpapers": {
-        "path": "./wallpapers",
-        "count": 42,
-        "formats": [
-          "webp",
-          "jpg"
-        ],
-        "description": "Colección de fondos de pantalla románticos en formato WebP con fallback JPG"
-      },
-      "scripts": {
-        "path": "./",
-        "files": [
-          "app.js",
-          "dom.js",
-          "favorites.js",
-          "search.js",
-          "share.js",
-          "theme.js",
-          "utils.js",
-          "diagnostics.js"
-        ]
-      },
-      "styles": {
-        "path": "./",
-        "files": [
-          "styles.css"
-        ]
-      }
-    }
-  },
-  "ai-capabilities": {
-    "discovery": {
-      "indexable": true,
-      "crawlable": true,
-      "sitemap": "sitemap.xml",
-      "robots": "robots.txt",
-      "llms": "llms.txt"
-    },
-    "content": {
-      "type": "static-gallery",
-      "language": "es",
-      "keywords": [
-        "fondos",
-        "romântico",
-        "whatsapp",
-        "plantillas",
+  "entries": [
+    {
+      "identifier": "urn:air:c0digos-para-compartir-por-whatsapp.pages.dev:site:romantic-html-library",
+      "displayName": "Biblioteca de plantillas HTML románticas",
+      "type": "text/html",
+      "url": "https://c0digos-para-compartir-por-whatsapp.pages.dev/",
+      "description": "Biblioteca web de plantillas HTML románticas, mensajes animados y tarjetas interactivas para compartir y personalizar.",
+      "tags": [
         "html",
-        "códigos",
-        "amor",
+        "plantillas",
+        "romántico",
+        "whatsapp",
+        "tarjetas",
         "mensajes",
-        "tarjetas"
+        "frontend"
       ],
-      "contentType": "text/html,image/webp,image/jpeg",
-      "updateFrequency": "monthly",
-      "lastModified": "2024-09-28T00:00:00Z"
-    },
-    "features": [
-      {
-        "name": "wallpaper-gallery",
-        "description": "Galería interactiva de fondos románticos",
-        "endpoint": "/"
-      },
-      {
-        "name": "search",
-        "description": "Búsqueda de fondos por categoría",
-        "endpoint": "/?search=true"
-      },
-      {
-        "name": "favorites",
-        "description": "Sistema de favoritos con localStorage",
-        "endpoint": "/"
-      },
-      {
-        "name": "share",
-        "description": "Compartir fondos en redes sociales",
-        "endpoint": "/"
-      },
-      {
-        "name": "dark-mode",
-        "description": "Tema oscuro adaptable",
-        "endpoint": "/"
+      "capabilities": [
+        "DiscoverTemplates",
+        "BrowseRomanticHTML",
+        "FindInteractiveMessages",
+        "FindShareableCards"
+      ],
+      "representativeQueries": [
+        "buscar plantillas HTML románticas para WhatsApp",
+        "encontrar tarjetas de amor interactivas",
+        "buscar mensajes HTML animados para compartir"
+      ],
+      "version": "1.0.0",
+      "metadata": {
+        "language": "es",
+        "mobileFriendly": true,
+        "resourceKind": "static-website"
       }
-    ]
-  },
-  "agents": {
-    "supported": [
-      "claude",
-      "gpt-4",
-      "gemini",
-      "copilot"
-    ],
-    "capabilities": [
-      "content-analysis",
-      "image-indexing",
-      "metadata-extraction",
-      "search-optimization",
-      "web-crawling"
-    ]
-  },
-  "seo": {
-    "title": "Códigos HTML de Amor - Fondos Románticos para WhatsApp",
-    "description": "Galería de plantillas y fondos románticos para compartir en WhatsApp. Colección de códigos HTML optimizados con WebP.",
-    "keywords": [
-      "fondos románticos",
-      "whatsapp",
-      "plantillas html",
-      "códigos amor",
-      "mensajes románticos"
-    ],
-    "og": {
-      "type": "website",
-      "image": "https://c0digos-para-compartir-por-whatsapp.pages.dev/wallpapers/fondo1.webp",
-      "image:width": 1200,
-      "image:height": 630
-    }
-  },
-  "technical": {
-    "framework": "vanilla-js",
-    "buildTool": "cloudflare-pages",
-    "pwa": {
-      "enabled": true,
-      "serviceworker": "sw.js"
     },
-    "performance": {
-      "optimization": "image-optimization",
-      "format": "webp-with-fallback",
-      "caching": "aggressive"
-    },
-    "headers": {
-      "cacheControl": "public, max-age=86400",
-      "contentSecurity": "strict",
-      "contentType": "application/json; charset=utf-8"
-    }
-  },
-  "deployment": {
-    "platform": "cloudflare-pages",
-    "buildCommand": "echo 'Static site - no build needed'",
-    "publishDirectory": "."
-  },
-  "integration": {
-    "llms": {
-      "enabled": true,
-      "file": "llms.txt"
-    },
-    "sitemaps": {
-      "enabled": true,
-      "file": "sitemap.xml"
-    },
-    "googleSiteVerification": true,
-    "cloudflareAnalytics": true
-  },
-  "social": {
-    "github": "https://github.com/Mitsuki3124/C0digos-para-compartir-por-WhatsApp",
-    "twitter": "@thorneldritch"
-  },
-  "metadata": {
-    "createdAt": "2024-01-01T00:00:00Z",
-    "updatedAt": "2024-09-28T00:00:00Z",
-    "maintainers": [
-      {
-        "name": "THORN ELDRITCH",
-        "email": "contact@thorneldritch.dev"
+    {
+      "identifier": "urn:air:c0digos-para-compartir-por-whatsapp.pages.dev:docs:llms-guide",
+      "displayName": "Guía para agentes y modelos",
+      "type": "text/plain",
+      "url": "https://c0digos-para-compartir-por-whatsapp.pages.dev/llms.txt",
+      "description": "Documento de orientación para agentes de IA y sistemas automatizados que necesiten descubrir y comprender los recursos públicos del sitio.",
+      "tags": [
+        "llms.txt",
+        "ai",
+        "agents",
+        "discovery",
+        "documentation"
+      ],
+      "capabilities": [
+        "ReadSiteDocumentation",
+        "UnderstandSiteResources",
+        "DiscoverPublicResources"
+      ],
+      "representativeQueries": [
+        "qué recursos públicos ofrece este sitio",
+        "cómo descubrir las plantillas disponibles en este sitio"
+      ],
+      "version": "1.0.0",
+      "metadata": {
+        "language": "es",
+        "resourceKind": "llm-guidance"
       }
-    ]
-  }
+    }
+  ]
 }

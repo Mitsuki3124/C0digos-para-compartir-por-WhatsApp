@@ -12,6 +12,14 @@ El sitio aloja más de 37 plantillas HTML interactivas categorizadas en:
 - **Contenido Temático**: Tarjetas Navideñas, Calendario de Adviento, Búsqueda del Tesoro
 - **Propuestas**: Quieres ser mi Novi@, Certificado del Amor
 
+## Descubrimiento para agentes
+
+El catálogo de capacidades y recursos para agentes de IA está disponible en:
+- `/.well-known/ai-catalog.json` (ruta estándar)
+- `/ai-catalog.json` (alias compatible)
+
+La respuesta se publica como `application/ai-catalog+json` para facilitar la validación y el descubrimiento automatizado.
+
 ## Información del Sitio
 
 **Desarrollador**: THORN ELDRITCH (Rayan)  

@@ -1,4 +1,5 @@
-/* Security Headers - Global
+/*
+  # SEGURIDAD - HTTP Security Headers (CSP ahora se genera dinámicamente en el Worker)
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
@@ -8,81 +9,42 @@
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Embedder-Policy: require-corp
   Cross-Origin-Resource-Policy: cross-origin
+  Access-Control-Allow-Origin: https://c0digos-para-compartir-por-whatsapp.pages.dev
   Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Accept
+  Access-Control-Allow-Headers: Content-Type
 
-/* HTML Files
 /*.html
   Cache-Control: public, max-age=3600, must-revalidate
   X-Content-Type-Options: nosniff
-  Content-Type: text/html; charset=utf-8
 
-/* JavaScript Files
 /**/*.js
   Cache-Control: public, max-age=31536000, immutable
-  Content-Type: application/javascript; charset=utf-8
 
-/* CSS Files
 /**/*.css
   Cache-Control: public, max-age=31536000, immutable
-  Content-Type: text/css; charset=utf-8
 
-/* Images and Media
 /wallpapers/**
   Cache-Control: public, max-age=2592000, immutable
-  Access-Control-Allow-Origin: *
 
 /**/*.{jpg,jpeg,png,webp,avif,gif,svg}
   Cache-Control: public, max-age=2592000, immutable
-  Access-Control-Allow-Origin: *
 
-/* Fonts
 /**/*.{woff,woff2,ttf,otf}
   Cache-Control: public, max-age=31536000, immutable
-  Access-Control-Allow-Origin: *
 
-/* Text Files
 /robots.txt
   Cache-Control: public, max-age=86400
-  Content-Type: text/plain; charset=utf-8
 
-/llms.txt
-  Cache-Control: public, max-age=86400
-  Content-Type: text/plain; charset=utf-8
-
-/* XML Files
 /sitemap.xml
   Cache-Control: public, max-age=86400
   Content-Type: application/xml; charset=utf-8
 
-/* JSON Files - CRÍTICO
 /ai-catalog.json
-  Cache-Control: public, max-age=86400, must-revalidate
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
+  Content-Type: application/ai-catalog+json; charset=utf-8
+  Cache-Control: public, max-age=3600, must-revalidate
   X-Content-Type-Options: nosniff
 
-/**/*.json
-  Cache-Control: public, max-age=86400
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-
-/* Favicon
-/favicon.ico
-  Cache-Control: public, max-age=2592000, immutable
-
-/* Ads and Analytics
-/ads.txt
-  Cache-Control: public, max-age=86400
-  Content-Type: text/plain; charset=utf-8
-
-/* Google Verification
-/google998d73614aa6ee9a.html
-  Cache-Control: public, max-age=2592000
-  Content-Type: text/html; charset=utf-8
-
-/* Service Worker
-/sw.js
+/.well-known/ai-catalog.json
+  Content-Type: application/ai-catalog+json; charset=utf-8
   Cache-Control: public, max-age=3600, must-revalidate
-  Content-Type: application/javascript; charset=utf-8
+  X-Content-Type-Options: nosniff
