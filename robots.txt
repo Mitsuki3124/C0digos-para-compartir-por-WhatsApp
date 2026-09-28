@@ -1,36 +1,68 @@
 # Robots.txt para Codigos para Compartir por WhatsApp
-# Politica de indexacion para motores de busqueda
+# Politica de indexacion para motores de busqueda y agentes de IA
 
 User-agent: *
 Allow: /
 Allow: /wallpapers/
 Allow: /sitemap.xml
-Allow: /*?q=
-Allow: /*?filter=
+Allow: /llms.txt
+Allow: /ai-catalog.json
+Allow: /robots.txt
+Allow: /?q=
+Allow: /?filter=
 
 # Evitar indexacion de archivos internos o de configuracion
 Disallow: /netlify.toml
 Disallow: /wrangler.toml
 Disallow: /.netlify/
 Disallow: /.git/
+Disallow: /.github/
 Disallow: /.agents/
 Disallow: /.vscode/
 Disallow: /node_modules/
+Disallow: /src/
 
-# Evitar duplicados por parametros no controlados
-Disallow: /*?*=*
-
+# Especificar agentes de IA permitidos
 User-agent: Googlebot
 Allow: /
-Allow: /*?q=
-Allow: /*?filter=
+Allow: /ai-catalog.json
+Allow: /llms.txt
+Allow: /sitemap.xml
+Allow: /?q=
+Allow: /?filter=
+
+User-agent: Googlebot-Image
+Allow: /
+Allow: /wallpapers/
 
 User-agent: Bingbot
 Allow: /
-Allow: /*?q=
-Allow: /*?filter=
+Allow: /ai-catalog.json
+Allow: /llms.txt
+Allow: /?q=
+Allow: /?filter=
 Crawl-delay: 1
 
+User-agent: Claude
+Allow: /
+Allow: /ai-catalog.json
+Allow: /llms.txt
+
+User-agent: GPTBot
+Allow: /
+Allow: /ai-catalog.json
+Allow: /llms.txt
+
+User-agent: Gemini
+Allow: /
+Allow: /ai-catalog.json
+Allow: /llms.txt
+
+User-agent: CCBot
+Allow: /
+Allow: /ai-catalog.json
+
+# Bloquear bots problemáticos
 User-agent: AhrefsBot
 Disallow: /
 
@@ -40,4 +72,12 @@ Disallow: /
 User-agent: SemrushBot
 Disallow: /
 
+User-agent: DotBot
+Disallow: /
+
+# Sitemaps and discovery
 Sitemap: https://c0digos-para-compartir-por-whatsapp.pages.dev/sitemap.xml
+Sitemap: https://c0digos-para-compartir-por-whatsapp.pages.dev/ai-catalog.json
+
+# Cache control
+Cache-Control: public, max-age=86400

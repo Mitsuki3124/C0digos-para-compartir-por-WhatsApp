@@ -3,14 +3,19 @@ type = "javascript"
 main = "src/index.js"
 compatibility_date = "2024-12-19"
 
+# Configuración de publicación (CRÍTICO para Pages)
 [env.production]
 routes = [
   { pattern = "c0digos-para-compartir-por-whatsapp.pages.dev", zone_name = "c0digos-para-compartir-por-whatsapp.pages.dev" }
 ]
 
+# Configuración de construcción
 [build]
 command = "npm run build"
 cwd = "./"
+publish_dir = "."
+
+# Archivos que deben vigilarse para cambios
 watch_paths = [
   "index.html",
   "wallpapers/**",
@@ -21,7 +26,25 @@ watch_paths = [
   "llms.txt",
   "package.json",
   "ads.txt",
+  "google998d73614aa6ee9a.html",
   "ai-catalog.json",
-  "*.js",
-  "*.css"
+  "app.js",
+  "dom.js",
+  "favorites.js",
+  "search.js",
+  "share.js",
+  "theme.js",
+  "utils.js",
+  "diagnostics.js",
+  "styles.css",
+  "sw.js",
+  "src/**/*.js"
 ]
+
+# Configuración de Workers
+[workers]
+main = "src/index.js"
+
+# Vinculación con Cloudflare Pages
+[pages_build_caching]
+enabled = true

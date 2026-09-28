@@ -1,0 +1,17 @@
+# Redirects for Cloudflare Pages
+# Ensure proper routing and SPA fallback
+
+# SPA fallback - redirect all non-file requests to index.html
+/*  /index.html  200
+
+# Ensure JSON files are served directly
+/ai-catalog.json  /ai-catalog.json  200
+/**/*.json  /:splat.json  200
+
+# Ensure manifest and config files
+/robots.txt  /robots.txt  200
+/sitemap.xml  /sitemap.xml  200
+/llms.txt  /llms.txt  200
+/_headers  /_headers  200
+/ads.txt  /ads.txt  200
+/package.json  /package.json  200

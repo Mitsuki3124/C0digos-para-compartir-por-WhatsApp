@@ -6,11 +6,11 @@
   "license": "MIT",
   "author": {
     "name": "THORN ELDRITCH",
-    "url": "https://github.com/KaeltharX"
+    "url": "https://github.com/Mitsuki3124"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/KaeltharX/C0digos-para-compartir-por-WhatsApp"
+    "url": "https://github.com/Mitsuki3124/C0digos-para-compartir-por-WhatsApp"
   },
   "homepage": "https://c0digos-para-compartir-por-whatsapp.pages.dev",
   "engines": {
@@ -24,16 +24,30 @@
       "wallpapers": {
         "path": "./wallpapers",
         "count": 42,
-        "formats": ["webp", "jpg"],
+        "formats": [
+          "webp",
+          "jpg"
+        ],
         "description": "Colección de fondos de pantalla románticos en formato WebP con fallback JPG"
       },
       "scripts": {
         "path": "./",
-        "files": ["app.js", "dom.js", "favorites.js", "search.js", "share.js", "theme.js", "utils.js", "diagnostics.js"]
+        "files": [
+          "app.js",
+          "dom.js",
+          "favorites.js",
+          "search.js",
+          "share.js",
+          "theme.js",
+          "utils.js",
+          "diagnostics.js"
+        ]
       },
       "styles": {
         "path": "./",
-        "files": ["styles.css"]
+        "files": [
+          "styles.css"
+        ]
       }
     }
   },
@@ -42,15 +56,26 @@
       "indexable": true,
       "crawlable": true,
       "sitemap": "sitemap.xml",
-      "robots": "robots.txt"
+      "robots": "robots.txt",
+      "llms": "llms.txt"
     },
     "content": {
       "type": "static-gallery",
       "language": "es",
-      "keywords": ["fondos", "romântico", "whatsapp", "plantillas", "html", "códigos"],
-      "contentType": "image/webp,image/jpeg",
+      "keywords": [
+        "fondos",
+        "romântico",
+        "whatsapp",
+        "plantillas",
+        "html",
+        "códigos",
+        "amor",
+        "mensajes",
+        "tarjetas"
+      ],
+      "contentType": "text/html,image/webp,image/jpeg",
       "updateFrequency": "monthly",
-      "lastModified": "2024-09-22T05:17:00Z"
+      "lastModified": "2024-09-28T00:00:00Z"
     },
     "features": [
       {
@@ -81,37 +106,53 @@
     ]
   },
   "agents": {
-    "supported": ["claude", "gpt-4", "gemini"],
+    "supported": [
+      "claude",
+      "gpt-4",
+      "gemini",
+      "copilot"
+    ],
     "capabilities": [
       "content-analysis",
       "image-indexing",
       "metadata-extraction",
-      "search-optimization"
+      "search-optimization",
+      "web-crawling"
     ]
   },
   "seo": {
     "title": "Códigos HTML de Amor - Fondos Románticos para WhatsApp",
     "description": "Galería de plantillas y fondos románticos para compartir en WhatsApp. Colección de códigos HTML optimizados con WebP.",
-    "keywords": ["fondos románticos", "whatsapp", "plantillas html", "códigos amor"],
+    "keywords": [
+      "fondos románticos",
+      "whatsapp",
+      "plantillas html",
+      "códigos amor",
+      "mensajes románticos"
+    ],
     "og": {
       "type": "website",
-      "image": "https://c0digos-para-compartir-por-whatsapp.pages.dev/wallpapers/fondo1.webp"
+      "image": "https://c0digos-para-compartir-por-whatsapp.pages.dev/wallpapers/fondo1.webp",
+      "image:width": 1200,
+      "image:height": 630
     }
   },
   "technical": {
     "framework": "vanilla-js",
-    "buildTool": "none",
+    "buildTool": "cloudflare-pages",
     "pwa": {
       "enabled": true,
       "serviceworker": "sw.js"
     },
     "performance": {
       "optimization": "image-optimization",
-      "format": "webp-with-fallback"
+      "format": "webp-with-fallback",
+      "caching": "aggressive"
     },
     "headers": {
-      "cacheControl": "max-age=3600",
-      "contentSecurity": "strict"
+      "cacheControl": "public, max-age=86400",
+      "contentSecurity": "strict",
+      "contentType": "application/json; charset=utf-8"
     }
   },
   "deployment": {
@@ -124,6 +165,25 @@
       "enabled": true,
       "file": "llms.txt"
     },
-    "googleSiteVerification": true
+    "sitemaps": {
+      "enabled": true,
+      "file": "sitemap.xml"
+    },
+    "googleSiteVerification": true,
+    "cloudflareAnalytics": true
+  },
+  "social": {
+    "github": "https://github.com/Mitsuki3124/C0digos-para-compartir-por-WhatsApp",
+    "twitter": "@thorneldritch"
+  },
+  "metadata": {
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-09-28T00:00:00Z",
+    "maintainers": [
+      {
+        "name": "THORN ELDRITCH",
+        "email": "contact@thorneldritch.dev"
+      }
+    ]
   }
 }
