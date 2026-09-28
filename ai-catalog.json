@@ -1,8 +1,129 @@
-"ai-capabilities": {
-  "discovery": {
-    "indexable": true,
-    "crawlable": true,
-    "sitemap": "sitemap.xml",
-    "robots": "robots.txt"
+{
+  "version": "1.0.0",
+  "name": "C0digos-para-compartir-por-WhatsApp",
+  "displayName": "Códigos HTML de Amor - Plantillas Románticas",
+  "description": "Galería de fondos románticos con soporte WebP y JPG fallback. Colección de plantillas HTML para compartir por WhatsApp.",
+  "license": "MIT",
+  "author": {
+    "name": "THORN ELDRITCH",
+    "url": "https://github.com/KaeltharX"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KaeltharX/C0digos-para-compartir-por-WhatsApp"
+  },
+  "homepage": "https://c0digos-para-compartir-por-whatsapp.pages.dev",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "manifest": {
+    "type": "web-application",
+    "platform": "cloudflare-pages",
+    "entryPoint": "index.html",
+    "assets": {
+      "wallpapers": {
+        "path": "./wallpapers",
+        "count": 42,
+        "formats": ["webp", "jpg"],
+        "description": "Colección de fondos de pantalla románticos en formato WebP con fallback JPG"
+      },
+      "scripts": {
+        "path": "./",
+        "files": ["app.js", "dom.js", "favorites.js", "search.js", "share.js", "theme.js", "utils.js", "diagnostics.js"]
+      },
+      "styles": {
+        "path": "./",
+        "files": ["styles.css"]
+      }
+    }
+  },
+  "ai-capabilities": {
+    "discovery": {
+      "indexable": true,
+      "crawlable": true,
+      "sitemap": "sitemap.xml",
+      "robots": "robots.txt"
+    },
+    "content": {
+      "type": "static-gallery",
+      "language": "es",
+      "keywords": ["fondos", "romântico", "whatsapp", "plantillas", "html", "códigos"],
+      "contentType": "image/webp,image/jpeg",
+      "updateFrequency": "monthly",
+      "lastModified": "2024-09-22T05:17:00Z"
+    },
+    "features": [
+      {
+        "name": "wallpaper-gallery",
+        "description": "Galería interactiva de fondos románticos",
+        "endpoint": "/"
+      },
+      {
+        "name": "search",
+        "description": "Búsqueda de fondos por categoría",
+        "endpoint": "/?search=true"
+      },
+      {
+        "name": "favorites",
+        "description": "Sistema de favoritos con localStorage",
+        "endpoint": "/"
+      },
+      {
+        "name": "share",
+        "description": "Compartir fondos en redes sociales",
+        "endpoint": "/"
+      },
+      {
+        "name": "dark-mode",
+        "description": "Tema oscuro adaptable",
+        "endpoint": "/"
+      }
+    ]
+  },
+  "agents": {
+    "supported": ["claude", "gpt-4", "gemini"],
+    "capabilities": [
+      "content-analysis",
+      "image-indexing",
+      "metadata-extraction",
+      "search-optimization"
+    ]
+  },
+  "seo": {
+    "title": "Códigos HTML de Amor - Fondos Románticos para WhatsApp",
+    "description": "Galería de plantillas y fondos románticos para compartir en WhatsApp. Colección de códigos HTML optimizados con WebP.",
+    "keywords": ["fondos románticos", "whatsapp", "plantillas html", "códigos amor"],
+    "og": {
+      "type": "website",
+      "image": "https://c0digos-para-compartir-por-whatsapp.pages.dev/wallpapers/fondo1.webp"
+    }
+  },
+  "technical": {
+    "framework": "vanilla-js",
+    "buildTool": "none",
+    "pwa": {
+      "enabled": true,
+      "serviceworker": "sw.js"
+    },
+    "performance": {
+      "optimization": "image-optimization",
+      "format": "webp-with-fallback"
+    },
+    "headers": {
+      "cacheControl": "max-age=3600",
+      "contentSecurity": "strict"
+    }
+  },
+  "deployment": {
+    "platform": "cloudflare-pages",
+    "buildCommand": "echo 'Static site - no build needed'",
+    "publishDirectory": "."
+  },
+  "integration": {
+    "llms": {
+      "enabled": true,
+      "file": "llms.txt"
+    },
+    "googleSiteVerification": true
   }
 }
