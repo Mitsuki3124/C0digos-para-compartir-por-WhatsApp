@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galaxia de Carritos Hot Wheels</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.152.2/build/three.module.js",
+        "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.152.2/examples/jsm/controls/OrbitControls.js"
+      }
+    }
+  </script>
+  <style>
+html, body { width: 100vw; height: 100vh; overflow: hidden; background: #000; }
+* { margin: 0; padding: 0; box-sizing: border-box; overflow: hidden; }
+#container { width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: 10; }
+canvas { position: fixed; top: 0; left: 0; z-index: 11; }
+
+/* Título fijo, sin movimiento */
+#title {
+  position: fixed; top: calc(env(safe-area-inset-top, 0px) + 3.5%); left: 0; right: 0;
+  z-index: 20; text-align: center; pointer-events: none; padding: 0 12px;
+}
+#title .big {
+  font: 800 clamp(34px, 10vw, 60px)/1.15 'Trebuchet MS', 'Arial Black', sans-serif;
+  color: #fff;
+  text-shadow: 0 0 6px #fff, 0 0 18px #ff7a00, 0 0 34px #1e6bff, 3px 3px 0 #0a3d91;
+}
+#title .sub {
+  margin-top: 6px;
+  font: 700 clamp(15px, 4.4vw, 22px)/1.2 'Trebuchet MS', sans-serif;
+  letter-spacing: 2px; text-transform: uppercase; color: #ffd9a0;
+  text-shadow: 0 0 10px #ff7a00, 2px 2px 0 #0a3d91;
+}
+
+
+#phrase {
+  position: fixed; left: 50%; top: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  z-index: 30; width: min(86vw, 460px); padding: 26px 24px 24px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  text-align: center; color: #fff;
+  background: linear-gradient(145deg, rgba(255,106,0,.96), rgba(255,45,45,.96) 55%, rgba(30,107,255,.96));
+  border: 4px solid #fff; border-radius: 26px;
+  box-shadow: 0 0 35px #ff6a00, 0 0 90px rgba(0,140,255,.85), inset 0 0 25px rgba(255,255,255,.25);
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s ease, transform .45s cubic-bezier(.2,1.5,.4,1);
+}
+#phrase.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+#phraseCar {
+  width: clamp(120px, 42vw, 210px); margin-top: -70px;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,.55)) drop-shadow(0 0 16px #ffb020);
+  animation: bob 1.2s ease-in-out infinite alternate;
+}
+@keyframes bob { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-8px) rotate(3deg); } }
+#phraseText {
+  font: 700 clamp(19px, 5.2vw, 27px)/1.4 'Georgia', 'Trebuchet MS', serif;
+  font-style: italic; letter-spacing: .3px; text-shadow: 2px 2px 0 #0a3d91, 0 0 14px rgba(0,0,0,.35);
+}
+
+
+#driver {
+  position: fixed; bottom: 6%; left: 0; z-index: 25; width: clamp(110px, 24vw, 200px);
+  pointer-events: none; display: none;
+  filter: drop-shadow(0 0 14px #ff6a00);
+}
+#driver.go { display: block; animation: drive 2.6s ease-in forwards; }
+@keyframes drive {
+  from { transform: translateX(-30vw); }
+  to   { transform: translateX(130vw); }
+}
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+  <div id="title"><div class="big">Para ti, amor 💙</div><div class="sub">Te quiero más de lo que imaginas </div></div>
+  <div id="phrase"><img id="phraseCar" crossorigin="anonymous" alt=""><div id="phraseText"></div></div>
+  <img id="driver" crossorigin="anonymous" alt="carrito" src="https://i.postimg.cc/LsbQKs0G/carr-Photoroom.png" />
+
+
+  <audio id="bgMusic" src="https://github.com/codeninja543/codeninja5433/raw/refs/heads/main/Manuel%20Medrano%20-%20Una%20y%20Otra%20Vez%20(Lyric%20Video)%20%20CantoYo.mp3" style="display:none" preload="auto"></audio>
+  <script>
+   
+    const START_AT = 34;
+    window.addEventListener('click', () => {
+      const audio = document.getElementById('bgMusic');
+      if (!audio) return;
+      audio.volume = 0.7;
+      const start = () => {
+        try { audio.currentTime = START_AT; } catch (e) {}
+        audio.play().catch(() => {});
+      };
+      if (audio.readyState >= 1) start();
+      else { audio.addEventListener('loadedmetadata', start, { once: true }); audio.load(); }
+      
+      audio.addEventListener('ended', () => {
+        audio.currentTime = START_AT;
+        audio.play().catch(() => {});
+      });
+    }, { once: true });
+  </script>
+
+  <script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+
+const carPhrases = [
+  "Si pudiera, te regalaría todos los Hot Wheels del mundo, pero prefiero regalarte mi corazón 💙",
+  "Eres mi piloto favorito y mi lugar favorito en el mundo 🏎️",
+  "Contigo cada día es una carrera que quiero ganar 🏁",
+  "Podría tener mil carritos, pero solo quiero quedarme contigo 💙",
+  "Tú eres mi meta, mi pista y mi mejor aventura 🏁",
+  "A tu lado siempre voy a toda velocidad, pero sin querer llegar a ningún otro lugar 💨",
+  "Feliz Día de los Carritos, amor. Gracias por hacerme tan feliz 🚗",
+  "Si mi corazón fuera un carrito, ya sabes quién lo maneja 🏎️💙",
+  "Eres mi campeón, mi todo y mi razón de sonreír 🏆",
+  "En esta carrera de la vida, te elijo a ti siempre 💙",
+  "Nadie corre por mi corazón como tú lo haces 🔥",
+  "Mi colección favorita eres tú 💙"
+];
+
+
+const carImages = [
+  "https://i.postimg.cc/LsbQKs0G/carr-Photoroom.png",
+  "https://i.postimg.cc/d0xNP0Sz/carr2-Photoroom.png",
+  "https://i.postimg.cc/CKQrTK62/images-Photoroom.png"
+];
+const COPIES_PER_IMAGE = 7; 
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x000000, 0.0015);
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000);
+camera.position.set(0, 18, 55);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.getElementById('container').appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.4;
+controls.target.set(0, 0, 0);
+controls.enablePan = false;
+controls.minDistance = 3;
+controls.maxDistance = 300;
+controls.zoomSpeed = 1.2;
+controls.rotateSpeed = 0.5;
+controls.update();
+
+function createGlowMaterial(color, size = 128, opacity = 0.55) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const context = canvas.getContext('2d');
+  const gradient = context.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+  gradient.addColorStop(0, color);
+  gradient.addColorStop(1, 'rgba(0,0,0,0)');
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, size, size);
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.SpriteMaterial({
+    map: texture, transparent: true, opacity,
+    depthWrite: false, blending: THREE.AdditiveBlending
+  });
+  return new THREE.Sprite(material);
+}
+
+const centralGlow = createGlowMaterial('rgba(255,120,0,0.95)', 156, 0.5);
+centralGlow.scale.set(8, 8, 1);
+scene.add(centralGlow);
+
+
+const nebulaColors = [
+  'rgba(0,110,255,0.6)', 'rgba(255,106,0,0.55)', 'rgba(0,60,200,0.6)',
+  'rgba(255,140,0,0.5)', 'rgba(30,144,255,0.6)', 'rgba(255,69,0,0.55)',
+  'rgba(0,90,220,0.55)', 'rgba(255,165,0,0.5)', 'rgba(65,105,225,0.6)',
+  'rgba(255,90,0,0.55)', 'rgba(0,150,255,0.55)', 'rgba(255,60,20,0.5)',
+  'rgba(20,80,200,0.6)', 'rgba(255,120,30,0.55)', 'rgba(0,120,255,0.6)'
+];
+for (let i = 0; i < 15; i++) {
+  const nebula = createGlowMaterial(nebulaColors[i], 256);
+  nebula.scale.set(100, 100, 1);
+  nebula.position.set(
+    (Math.random() - 0.5) * 175,
+    (Math.random() - 0.5) * 175,
+    (Math.random() - 0.5) * 175
+  );
+  scene.add(nebula);
+}
+
+const galaxyParameters = {
+  count: 100000, arms: 6, radius: 100, spin: 0.5,
+  randomness: 0.2, randomnessPower: 20
+};
+
+const positions = new Float32Array(galaxyParameters.count * 3);
+const colors = new Float32Array(galaxyParameters.count * 3);
+let pointIdx = 0;
+const cInside = new THREE.Color(0xff7a00);  // naranja
+const cOutside = new THREE.Color(0x1e6bff); // azul
+for (let i = 0; i < galaxyParameters.count; i++) {
+  const radius = Math.pow(Math.random(), galaxyParameters.randomnessPower) * galaxyParameters.radius;
+  const branchAngle = (i % galaxyParameters.arms) / galaxyParameters.arms * Math.PI * 2;
+  const spinAngle = radius * galaxyParameters.spin;
+  const randomX = (Math.random() - 0.5) * galaxyParameters.randomness * radius;
+  const randomY = (Math.random() - 0.5) * galaxyParameters.randomness * radius * 1.2;
+  const randomZ = (Math.random() - 0.5) * galaxyParameters.randomness * radius;
+  const totalAngle = branchAngle + spinAngle;
+  if (radius < 30 && Math.random() < 0.8) continue;
+  const i3 = pointIdx * 3;
+  positions[i3] = Math.cos(totalAngle) * radius + randomX;
+  positions[i3+1] = randomY;
+  positions[i3+2] = Math.sin(totalAngle) * radius + randomZ;
+  const t = radius / galaxyParameters.radius;
+  const mixedColor = cInside.clone().lerp(cOutside, Math.min(1, t * 1.6));
+  mixedColor.multiplyScalar(0.7 + 0.3 * Math.random());
+  colors[i3] = mixedColor.r;
+  colors[i3+1] = mixedColor.g;
+  colors[i3+2] = mixedColor.b;
+  pointIdx++;
+}
+
+const galaxyGeometry = new THREE.BufferGeometry();
+galaxyGeometry.setAttribute('position', new THREE.BufferAttribute(positions.slice(0, pointIdx*3), 3));
+galaxyGeometry.setAttribute('color', new THREE.BufferAttribute(colors.slice(0, pointIdx*3), 3));
+
+const galaxyMaterial = new THREE.ShaderMaterial({
+  uniforms: { uSize: { value: 50.0 * renderer.getPixelRatio() } },
+  vertexShader: `
+    uniform float uSize;
+    varying vec3 vColor;
+    void main() {
+      vColor = color;
+      vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+      gl_Position = projectionMatrix * viewPosition;
+      gl_PointSize = uSize / -viewPosition.z;
+    }
+  `,
+  fragmentShader: `
+    varying vec3 vColor;
+    void main() {
+      float dist = length(gl_PointCoord - vec2(0.5));
+      if (dist > 0.5) discard;
+      gl_FragColor = vec4(vColor, 1.0);
+    }
+  `,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+  transparent: true,
+  vertexColors: true
+});
+scene.add(new THREE.Points(galaxyGeometry, galaxyMaterial));
+
+const photoGroup = new THREE.Group();
+scene.add(photoGroup);
+const photoSprites = [];
+
+function makePhotoTexture(img, isPng) {
+  const maxSide = 512;
+  const ratio = img.width / img.height;
+  const w = ratio >= 1 ? maxSide : Math.round(maxSide * ratio);
+  const h = ratio >= 1 ? Math.round(maxSide / ratio) : maxSide;
+  const pad = isPng ? 0 : 14;
+  const canvas = document.createElement('canvas');
+  canvas.width = w + pad * 2;
+  canvas.height = h + pad * 2;
+  const ctx = canvas.getContext('2d');
+  if (!isPng) {
+
+    const r = 34;
+    ctx.shadowColor = '#ff7a00';
+    ctx.shadowBlur = 18;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.arcTo(canvas.width, 0, canvas.width, canvas.height, r);
+    ctx.arcTo(canvas.width, canvas.height, 0, canvas.height, r);
+    ctx.arcTo(0, canvas.height, 0, 0, r);
+    ctx.arcTo(0, 0, canvas.width, 0, r);
+    ctx.closePath();
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.save();
+    ctx.beginPath();
+    const ir = 22;
+    ctx.moveTo(pad + ir, pad);
+    ctx.arcTo(pad + w, pad, pad + w, pad + h, ir);
+    ctx.arcTo(pad + w, pad + h, pad, pad + h, ir);
+    ctx.arcTo(pad, pad + h, pad, pad, ir);
+    ctx.arcTo(pad, pad, pad + w, pad, ir);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(img, pad, pad, w, h);
+    ctx.restore();
+  } else {
+    ctx.drawImage(img, 0, 0, w, h);
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.minFilter = THREE.LinearFilter;
+  tex.generateMipmaps = false;
+  return { tex, aspect: canvas.width / canvas.height };
+}
+
+carImages.forEach((src, imgIdx) => {
+  const img = new Image();
+  img.crossOrigin = 'Anonymous';
+  img.onload = () => {
+    const isPng = true; // PNG sin fondo: sin marco
+    const { tex, aspect } = makePhotoTexture(img, isPng);
+    for (let c = 0; c < COPIES_PER_IMAGE; c++) {
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, fog: false });
+      const sprite = new THREE.Sprite(mat);
+      const baseH = 9 + Math.random() * 5;
+      sprite.userData.baseScale = new THREE.Vector3(baseH * aspect, baseH, 1);
+      sprite.scale.copy(sprite.userData.baseScale);
+      sprite.userData.src = src;
+      // Distribuidos alrededor de la galaxia
+      const slot = c * carImages.length + imgIdx; // alterna las 3 fotos una tras otra
+      const angle = (slot / (carImages.length * COPIES_PER_IMAGE)) * Math.PI * 2 + (Math.random() - 0.5) * 0.15;
+      const radius = 32 + (slot % 3) * 14 + Math.random() * 8; // 3 órbitas mezcladas
+      sprite.position.set(
+        Math.cos(angle) * radius,
+        (Math.random() - 0.5) * 22,
+        Math.sin(angle) * radius
+      );
+      sprite.userData.phase = Math.random() * Math.PI * 2;
+      sprite.userData.baseY = sprite.position.y;
+      sprite.userData.pop = 0;
+      const glowCols = ['rgba(255,140,30,0.9)','rgba(40,140,255,0.9)'];
+      const glow = createGlowMaterial(glowCols[(c + imgIdx) % 2], 128, 0.55);
+      glow.material.fog = false;
+      glow.scale.set(baseH * aspect * 1.9, baseH * 1.9, 1);
+      glow.position.copy(sprite.position);
+      glow.renderOrder = 1;
+      sprite.renderOrder = 2;
+      sprite.userData.glow = glow;
+      photoGroup.add(glow);
+      photoGroup.add(sprite);
+      photoSprites.push(sprite);
+    }
+  };
+  img.onerror = () => console.warn('No cargó la imagen:', src);
+  img.src = src;
+});
+
+const orbitPhrases = [
+  "Te amo", "Eres mi único", "Mi campeón", "Eres mi todo",
+  "Mi novio hermoso", "Mi piloto favorito", "Mi corazón es tuyo", "Siempre tú",
+  "Mi amor", "Te adoro", "Mi persona favorita", "Te elijo siempre",
+  "Contigo a toda velocidad", "Mi mejor carrera eres tú", "Mi razón de sonreír", "Te amo mucho"
+];
+const phraseGroup = new THREE.Group();
+scene.add(phraseGroup);
+const phraseSprites = [];
+
+function makePhraseSprite(text, colorIdx) {
+  const W = 1024, H = 200;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  let fs = 110;
+  ctx.font = `bold ${fs}px 'Trebuchet MS', 'Arial Black', sans-serif`;
+  while (ctx.measureText(text).width > W - 80 && fs > 40) {
+    fs -= 4;
+    ctx.font = `bold ${fs}px 'Trebuchet MS', 'Arial Black', sans-serif`;
+  }
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const glowC = colorIdx % 2 ? '#1e6bff' : '#ff7a00';
+  const fillC = colorIdx % 2 ? '#8fc0ff' : '#ffb15c';
+  ctx.shadowColor = glowC; ctx.shadowBlur = 40;
+  ctx.lineWidth = 10; ctx.strokeStyle = glowC;
+  ctx.strokeText(text, W/2, H/2);
+  ctx.shadowBlur = 20; ctx.fillStyle = fillC;
+  ctx.fillText(text, W/2, H/2);
+  ctx.shadowBlur = 6; ctx.shadowColor = '#fff'; ctx.fillStyle = '#ffffff';
+  ctx.fillText(text, W/2, H/2);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, fog: false }));
+  sp.scale.set(15, 15 * H / W, 1);
+  return sp;
+}
+orbitPhrases.forEach((t, i) => {
+  const sp = makePhraseSprite(t, i);
+  const angle = (i / orbitPhrases.length) * Math.PI * 2 + 0.2;
+  const radius = 22 + ((i * 7) % 5) * 13; // distintas órbitas
+  sp.position.set(Math.cos(angle) * radius, (Math.random() - 0.5) * 26, Math.sin(angle) * radius);
+  sp.userData.baseY = sp.position.y;
+  sp.userData.phase = Math.random() * Math.PI * 2;
+  phraseGroup.add(sp);
+  phraseSprites.push(sp);
+});
+
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+const phraseEl = document.getElementById('phrase');
+const phraseTextEl = document.getElementById('phraseText');
+const phraseCarEl = document.getElementById('phraseCar');
+const driverEl = document.getElementById('driver');
+let phraseTimer = null;
+let lastPhrase = -1;
+let phraseDeck = [];
+let firstTap = true;
+let downX = 0, downY = 0;
+
+function pickSprite(clientX, clientY) {
+  pointer.x = (clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(photoSprites, false);
+  return hits.length ? hits[0].object : null;
+}
+
+function hidePhrase() {
+  clearTimeout(phraseTimer);
+  phraseEl.classList.remove('show');
+}
+
+function showPhrase(sprite) {
+  if (!phraseDeck.length) {
+    
+    const rest = carPhrases.slice(1).sort(() => Math.random() - 0.5);
+    phraseDeck = (firstTap ? [0] : []).concat(rest);
+    if (!firstTap) phraseDeck.push(0);
+    phraseDeck = phraseDeck.map(v => typeof v === 'number' ? v : carPhrases.indexOf(v));
+    firstTap = false;
+  }
+  const idx = phraseDeck.shift();
+  lastPhrase = idx;
+  phraseTextEl.textContent = carPhrases[idx];
+  phraseCarEl.src = sprite.userData.src;
+  driverEl.src = carImages[Math.floor(Math.random() * carImages.length)];
+  phraseEl.classList.remove('show');
+  void phraseEl.offsetWidth; // reinicia la animación de entrada
+  phraseEl.classList.add('show');
+  clearTimeout(phraseTimer);
+
+  // el carrito cruza la pantalla
+  driverEl.classList.remove('go');
+  void driverEl.offsetWidth; // reinicia animación
+  driverEl.classList.add('go');
+
+  sprite.userData.pop = 1; // efecto de rebote
+}
+driverEl.addEventListener('animationend', () => driverEl.classList.remove('go'));
+
+const dom = renderer.domElement;
+dom.addEventListener('pointerdown', e => { downX = e.clientX; downY = e.clientY; });
+dom.addEventListener('pointerup', e => {
+  if (Math.hypot(e.clientX - downX, e.clientY - downY) > 8) return; // fue arrastre, no toque
+  const s = pickSprite(e.clientX, e.clientY);
+  if (s) showPhrase(s); else hidePhrase();
+});
+dom.addEventListener('pointermove', e => {
+  if (e.pointerType === 'mouse') dom.style.cursor = pickSprite(e.clientX, e.clientY) ? 'pointer' : 'default';
+});
+
+scene.add(new THREE.AmbientLight(0x99bbff, 0.32));
+
+const starMat = new THREE.ShaderMaterial({
+  uniforms: { uTime: { value: 0 }, uPR: { value: renderer.getPixelRatio() } },
+  vertexShader: `
+    attribute float aSize; attribute float aPhase; attribute vec3 aColor;
+    uniform float uTime; uniform float uPR;
+    varying vec3 vC; varying float vA;
+    void main() {
+      vC = aColor;
+      vA = 0.6 + 0.4 * sin(uTime * (1.0 + aPhase * 2.0) + aPhase * 40.0);
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      gl_Position = projectionMatrix * mv;
+      gl_PointSize = clamp(aSize * uPR * (260.0 / -mv.z), 1.0, 26.0 * uPR);
+    }`,
+  fragmentShader: `
+    varying vec3 vC; varying float vA;
+    void main() {
+      float d = length(gl_PointCoord - 0.5);
+      if (d > 0.5) discard;
+      float core = smoothstep(0.5, 0.0, d);
+      gl_FragColor = vec4(vC * (0.5 + core), core * core * vA + 0.05 * vA);
+    }`,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+});
+
+function buildStars(count, rMin, rMax, flatten, sizeMin, sizeMax) {
+  const pos = new Float32Array(count * 3);
+  const col = new Float32Array(count * 3);
+  const size = new Float32Array(count);
+  const ph = new Float32Array(count);
+  const palette = [
+    new THREE.Color(0xffffff), new THREE.Color(0xbcd8ff), new THREE.Color(0x7fb2ff),
+    new THREE.Color(0xffd9a0), new THREE.Color(0xffa04a)
+  ];
+  for (let i = 0; i < count; i++) {
+    const r = rMin + Math.pow(Math.random(), 0.8) * (rMax - rMin);
+    const th = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    pos[i*3]   = r * Math.sin(phi) * Math.cos(th);
+    pos[i*3+1] = r * Math.cos(phi) * flatten;
+    pos[i*3+2] = r * Math.sin(phi) * Math.sin(th);
+    const c = palette[Math.floor(Math.random() * palette.length)];
+    col[i*3] = c.r; col[i*3+1] = c.g; col[i*3+2] = c.b;
+    size[i] = sizeMin + Math.pow(Math.random(), 3) * (sizeMax - sizeMin);
+    ph[i] = Math.random();
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('aColor', new THREE.BufferAttribute(col, 3));
+  g.setAttribute('aSize', new THREE.BufferAttribute(size, 1));
+  g.setAttribute('aPhase', new THREE.BufferAttribute(ph, 1));
+  const pts = new THREE.Points(g, starMat);
+  pts.frustumCulled = false;
+  scene.add(pts);
+  return pts;
+}
+// Cielo lejano, halo cercano alrededor de la galaxia y polvo estelar
+buildStars(9000, 350, 1100, 1.0, 0.6, 2.6);
+buildStars(5000, 90, 320, 0.7, 0.5, 2.2);
+buildStars(3500, 20, 140, 0.35, 0.4, 1.6);
+
+// Brazos espirales bien definidos (estrellas de la galaxia)
+(function buildSpiral() {
+  const N = 90000, ARMS = 4, R = 115;
+  const pos = new Float32Array(N * 3);
+  const col = new Float32Array(N * 3);
+  const size = new Float32Array(N);
+  const ph = new Float32Array(N);
+  const inner = new THREE.Color(0xffa62b), mid = new THREE.Color(0xff6a1a), outer = new THREE.Color(0x2f7bff);
+  const white = new THREE.Color(0xffffff);
+  for (let i = 0; i < N; i++) {
+    const t = Math.pow(Math.random(), 1.5);
+    const radius = 6 + t * R;
+    const arm = (i % ARMS) / ARMS * Math.PI * 2;
+    const angle = arm + radius * 0.09;
+    const spread = (0.6 + radius * 0.05);
+    const rx = (Math.random() + Math.random() + Math.random() - 1.5) * spread * 2.2;
+    const rz = (Math.random() + Math.random() + Math.random() - 1.5) * spread * 2.2;
+    const ry = (Math.random() + Math.random() - 1) * (2.5 + (1 - t) * 6);
+    pos[i*3]   = Math.cos(angle) * radius + rx;
+    pos[i*3+1] = ry;
+    pos[i*3+2] = Math.sin(angle) * radius + rz;
+    const k = radius / R;
+    const c = k < 0.3 ? inner.clone().lerp(mid, k / 0.3) : mid.clone().lerp(outer, (k - 0.3) / 0.7);
+    if (Math.random() < 0.12) c.lerp(white, 0.75);
+    col[i*3] = c.r; col[i*3+1] = c.g; col[i*3+2] = c.b;
+    size[i] = 0.35 + Math.pow(Math.random(), 4) * 1.6;
+    ph[i] = Math.random();
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('aColor', new THREE.BufferAttribute(col, 3));
+  g.setAttribute('aSize', new THREE.BufferAttribute(size, 1));
+  g.setAttribute('aPhase', new THREE.BufferAttribute(ph, 1));
+  const pts = new THREE.Points(g, starMat);
+  pts.frustumCulled = false;
+  scene.add(pts);
+  window.spiralGalaxy = pts;
+})();
+
+
+let shootingStars = [];
+function createRandomCurve() {
+  const s = new THREE.Vector3(-200 + Math.random() * 100, -100 + Math.random() * 200, -100 + Math.random() * 200);
+  const e = new THREE.Vector3(600 + Math.random() * 200, s.y + (-100 + Math.random() * 200), s.z + (-100 + Math.random() * 200));
+  const c1 = new THREE.Vector3(s.x + 200 + Math.random() * 100, s.y + (-50 + Math.random() * 100), s.z + (-50 + Math.random() * 100));
+  const c2 = new THREE.Vector3(e.x - 200 + Math.random() * 100, e.y + (-50 + Math.random() * 100), e.z + (-50 + Math.random() * 100));
+  return new THREE.CubicBezierCurve3(s, c1, c2, e);
+}
+function createShootingStar() {
+  const trailLength = 100;
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(2, 32, 32),
+    new THREE.MeshBasicMaterial({ color: 0xff7a00, transparent: true, opacity: 0, blending: THREE.AdditiveBlending })
+  );
+  const glow = new THREE.Mesh(
+    new THREE.SphereGeometry(3, 32, 32),
+    new THREE.ShaderMaterial({
+      uniforms: { time: { value: 0 } },
+      vertexShader: `varying vec3 vNormal; void main() { vNormal = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: `varying vec3 vNormal; uniform float time; void main() { float intensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0); gl_FragColor = vec4(1.0, 0.5, 0.05, intensity * (0.8 + sin(time * 5.0) * 0.2)); }`,
+      transparent: true, blending: THREE.AdditiveBlending, side: THREE.BackSide
+    })
+  );
+  head.add(glow);
+  const curve = createRandomCurve();
+  const trailPoints = [];
+  for (let i = 0; i < trailLength; i++) trailPoints.push(curve.getPoint(i / (trailLength - 1)));
+  const trail = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(trailPoints),
+    new THREE.LineBasicMaterial({ color: 0x2f8bff, transparent: true, opacity: 0.7 })
+  );
+  const group = new THREE.Group();
+  group.add(head); group.add(trail);
+  group.userData = { curve, progress: 0, speed: 0.001 + Math.random() * 0.001, life: 0, maxLife: 300, head, trail, trailLength, trailPoints };
+  scene.add(group);
+  shootingStars.push(group);
+}
+
+
+function createPlanetTexture(size = 512) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const g = ctx.createRadialGradient(size/2, size/2, size/8, size/2, size/2, size/2);
+  g.addColorStop(0.00, '#fff1cc');
+  g.addColorStop(0.10, '#ffb020');
+  g.addColorStop(0.25, '#ff7a00');
+  g.addColorStop(0.40, '#e04a00');
+  g.addColorStop(0.55, '#1e6bff');
+  g.addColorStop(0.70, '#0b3fbf');
+  g.addColorStop(0.85, '#061f66');
+  g.addColorStop(1.00, '#020a26');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, size, size);
+  for (let i = 0; i < 8; i++) {
+    ctx.beginPath();
+    ctx.moveTo(0, size*(0.15+i*0.1));
+    ctx.bezierCurveTo(size*0.3, size*(0.12+i*0.1), size*0.7, size*(0.18+i*0.1), size, size*(0.15+i*0.1));
+    ctx.strokeStyle = i % 2 ? 'rgba(255,255,255,0.28)' : 'rgba(255,140,0,0.35)';
+    ctx.lineWidth = 10 + Math.random() * 10;
+    ctx.stroke();
+  }
+  return new THREE.CanvasTexture(canvas);
+}
+
+const stormShader = {
+  vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `
+    uniform float time; uniform sampler2D baseTexture; varying vec2 vUv;
+    void main() {
+      vec2 uv = vUv;
+      float angle = length(uv - vec2(0.5)) * 2.5;
+      float twist = sin(angle * 2.0 + time) * 0.08;
+      uv.x += twist * sin(time * 0.7); uv.y += twist * cos(time * 0.7);
+      vec4 texColor = texture2D(baseTexture, uv);
+      float noise = sin(uv.x * 8.0 + time) * sin(uv.y * 8.0 + time) * 0.08;
+      texColor.rgb += noise * vec3(0.9, 0.5, 0.1);
+      gl_FragColor = texColor;
+    }`
+};
+
+const planetRadius = 10;
+const planet = new THREE.Mesh(
+  new THREE.SphereGeometry(planetRadius, 48, 48),
+  new THREE.ShaderMaterial({
+    uniforms: { time: { value: 0.0 }, baseTexture: { value: createPlanetTexture() } },
+    vertexShader: stormShader.vertexShader,
+    fragmentShader: stormShader.fragmentShader
+  })
+);
+scene.add(planet);
+
+planet.add(new THREE.Mesh(
+  new THREE.SphereGeometry(planetRadius * 1.05, 48, 48),
+  new THREE.ShaderMaterial({
+    uniforms: { glowColor: { value: new THREE.Color(0xff7a00) } },
+    vertexShader: `varying vec3 vNormal; void main() { vNormal = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `varying vec3 vNormal; uniform vec3 glowColor; void main() { float intensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0); gl_FragColor = vec4(glowColor, 1.0) * intensity; }`,
+    side: THREE.BackSide, blending: THREE.AdditiveBlending, transparent: true
+  })
+));
+
+
+const ringTexts = ["Feliz Día", "Hot Wheels", "Campeón", "Carritos"];
+
+function createTextRings() {
+  const numRings = ringTexts.length;
+  const baseRingRadius = planetRadius * 1.1;
+  const ringSpacing = 5;
+  window.textRings = [];
+
+  for (let i = 0; i < numRings; i++) {
+    const ringRadius = baseRingRadius + i * ringSpacing;
+    const textureHeight = 200;
+    const fontSize = 160;
+
+    const tempCtx = document.createElement('canvas').getContext('2d');
+    tempCtx.font = `bold ${fontSize}px 'Trebuchet MS', 'Arial Black', sans-serif`;
+
+    const separator = '        ';
+    const segment = ringTexts[i] + separator;
+    const segmentWidth = tempCtx.measureText(segment).width;
+    const textureWidthCircumference = 2 * Math.PI * ringRadius * 180;
+    const repeatCount = Math.ceil(textureWidthCircumference / segmentWidth);
+    let fullText = '';
+    for (let j = 0; j < repeatCount; j++) fullText += segment;
+    const finalTextureWidth = Math.ceil(Math.max(1, segmentWidth * repeatCount));
+
+    const textCanvas = document.createElement('canvas');
+    textCanvas.width = Math.min(finalTextureWidth, 16384);
+    textCanvas.height = textureHeight;
+    const ctx = textCanvas.getContext('2d');
+    ctx.font = `bold ${fontSize}px 'Trebuchet MS', 'Arial Black', sans-serif`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+
+    ctx.shadowColor = '#0a4bff';
+    ctx.shadowBlur = 35;
+    ctx.lineWidth = 12;
+    ctx.strokeStyle = '#1e6bff';
+    ctx.strokeText(fullText, 0, textureHeight * 0.80);
+
+    ctx.shadowColor = '#ffb060';
+    ctx.shadowBlur = 20;
+    ctx.fillStyle = '#ff8a1e';
+    ctx.fillText(fullText, 0, textureHeight * 0.80);
+
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = '#ffe0b0';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(fullText, 0, textureHeight * 0.80);
+
+    const ringTexture = new THREE.CanvasTexture(textCanvas);
+    ringTexture.wrapS = THREE.RepeatWrapping;
+    ringTexture.repeat.x = textCanvas.width / textureWidthCircumference;
+    ringTexture.needsUpdate = true;
+
+    const ringMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(ringRadius, ringRadius, 1.8, 128, 1, true),
+      new THREE.MeshBasicMaterial({
+        map: ringTexture, transparent: true, side: THREE.DoubleSide,
+        alphaTest: 0.01, opacity: 1.0, depthWrite: false
+      })
+    );
+    ringMesh.rotation.y = Math.PI / 2;
+
+    const ringGroup = new THREE.Group();
+    ringGroup.add(ringMesh);
+    ringGroup.userData = { angleOffset: 0.15 * Math.PI * 0.5, speed: 0.00225 };
+    ringGroup.rotation.x = i / numRings * Math.PI;
+    scene.add(ringGroup);
+    window.textRings.push(ringGroup);
+  }
+}
+createTextRings();
+
+function animatePlanetSystem() {
+  if (!window.textRings) return;
+  const time = Date.now() * 0.001;
+  window.textRings.forEach((ringGroup, index) => {
+    ringGroup.userData.angleOffset += ringGroup.userData.speed;
+    ringGroup.rotation.x = (index / window.textRings.length) * Math.PI;
+    ringGroup.rotation.y = ringGroup.userData.angleOffset;
+    const pulse = (Math.sin(time * 1.5 + index) + 1) / 2;
+    const m = ringGroup.children[0];
+    if (m && m.material) m.material.opacity = 0.85 + pulse * 0.15;
+  });
+}
+
+/* ===================== TEXTO FLOTANTE ===================== */
+function createHintText() {
+  const canvasW = 1024, canvasH = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvasW; canvas.height = canvasH;
+  const ctx = canvas.getContext('2d');
+  const text = 'Toca un carrito para ver tu mensaje';
+
+  const bg = ctx.createRadialGradient(canvasW/2, canvasH/2, 10, canvasW/2, canvasH/2, canvasW/2.2);
+  bg.addColorStop(0, 'rgba(0,80,220,0.6)');
+  bg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvasW, canvasH);
+
+  ctx.font = `bold 100px 'Trebuchet MS', 'Arial Black', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.shadowColor = '#0a3d91'; ctx.shadowBlur = 50;
+  ctx.lineWidth = 8; ctx.strokeStyle = '#1e6bff';
+  ctx.strokeText(text, canvasW/2, canvasH/2);
+
+  ctx.shadowColor = '#ff9a3c'; ctx.shadowBlur = 25;
+  ctx.fillStyle = '#ff7a00';
+  ctx.fillText(text, canvasW/2, canvasH/2);
+
+  ctx.shadowColor = 'rgba(255,220,180,0.9)'; ctx.shadowBlur = 10;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(text, canvasW/2, canvasH/2);
+
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(28, 7),
+    new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true, side: THREE.DoubleSide })
+  );
+  mesh.position.set(0, 20, 0);
+  scene.add(mesh);
+  return mesh;
+}
+
+
+function createTopText() {
+  const W = 1024, H = 300;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  const bg = ctx.createRadialGradient(W/2, H/2, 10, W/2, H/2, W/2.2);
+  bg.addColorStop(0, 'rgba(255,90,0,0.5)');
+  bg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  const text = 'Para ti, amor 💙';
+  ctx.font = `bold 135px 'Trebuchet MS', 'Arial Black', sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.shadowColor = '#1e6bff'; ctx.shadowBlur = 55;
+  ctx.lineWidth = 14; ctx.strokeStyle = '#1e6bff';
+  ctx.strokeText(text, W/2, H/2);
+  ctx.shadowColor = '#ff9a3c'; ctx.shadowBlur = 30;
+  ctx.fillStyle = '#ff7a00';
+  ctx.fillText(text, W/2, H/2);
+  ctx.shadowColor = 'rgba(255,230,200,0.9)'; ctx.shadowBlur = 10;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(text, W/2, H/2);
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(32, 32 * H / W),
+    new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, side: THREE.DoubleSide, depthWrite: false })
+  );
+  mesh.position.set(0, 30, 0);
+  scene.add(mesh);
+  return mesh;
+}
+
+
+/* ===================== ANIMACIÓN ===================== */
+function animate() {
+  requestAnimationFrame(animate);
+  const time = performance.now() * 0.001;
+  controls.update();
+  starMat.uniforms.uTime.value = time;
+  if (window.spiralGalaxy) window.spiralGalaxy.rotation.y += 0.0006;
+  planet.material.uniforms.time.value = time * 0.5;
+
+
+  // Las fotos giran lento alrededor de la galaxia y flotan
+  photoGroup.rotation.y += 0.0012;
+  phraseGroup.rotation.y -= 0.0008; // giran en sentido contrario a las fotos
+  phraseSprites.forEach(sp => {
+    sp.position.y = sp.userData.baseY + Math.sin(time * 1.1 + sp.userData.phase) * 1.5;
+    sp.material.opacity = 0.8 + Math.sin(time * 2 + sp.userData.phase) * 0.2;
+  });
+  photoSprites.forEach(s => {
+    s.position.y = s.userData.baseY + Math.sin(time * 1.2 + s.userData.phase) * 1.2;
+    if (s.userData.glow) {
+      s.userData.glow.position.copy(s.position);
+      const gp = 0.9 + Math.sin(time * 2 + s.userData.phase) * 0.1;
+      s.userData.glow.material.opacity = 0.45 * gp + 0.15;
+    }
+    if (s.userData.pop > 0) {
+      s.userData.pop = Math.max(0, s.userData.pop - 0.03);
+      const k = 1 + Math.sin(s.userData.pop * Math.PI) * 0.6;
+      s.scale.set(s.userData.baseScale.x * k, s.userData.baseScale.y * k, 1);
+    }
+  });
+
+  for (let i = shootingStars.length - 1; i >= 0; i--) {
+    const star = shootingStars[i];
+    const d = star.userData;
+    d.life++;
+    let opacity = 1.0;
+    if (d.life < 30) opacity = d.life / 30;
+    else if (d.life > d.maxLife - 30) opacity = (d.maxLife - d.life) / 30;
+    d.progress += d.speed;
+    if (d.progress > 1) { scene.remove(star); shootingStars.splice(i, 1); continue; }
+    const currentPos = d.curve.getPoint(d.progress);
+    star.position.copy(currentPos);
+    d.head.material.opacity = opacity;
+    d.head.children[0].material.uniforms.time.value = time;
+    d.trailPoints[0].copy(currentPos);
+    for (let j = 1; j < d.trailLength; j++) {
+      d.trailPoints[j].copy(d.curve.getPoint(Math.max(0, d.progress - j * 0.01)));
+    }
+    d.trail.geometry.setFromPoints(d.trailPoints);
+    d.trail.material.opacity = opacity * 0.7;
+  }
+  if (shootingStars.length < 3 && Math.random() < 0.02) createShootingStar();
+
+  planet.lookAt(camera.position);
+  animatePlanetSystem();
+  renderer.render(scene, camera);
+}
+
+createShootingStar();
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+  </script>
+</body>
+</html>

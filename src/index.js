@@ -25,6 +25,7 @@ export default {
     const nonce2 = generateNonce(); // Android detection
     const nonce3 = generateNonce(); // JSON-LD / Structured data
     const nonce4 = generateNonce(); // Service Worker
+    const nonce5 = generateNonce(); // CSS crítico en línea
     
     // Leer el body del response
     let html = await response.text();
@@ -34,6 +35,7 @@ export default {
     html = html.replace(/ _nonce="2"/g, ` nonce="${nonce2}"`);
     html = html.replace(/ _nonce="3"/g, ` nonce="${nonce3}"`);
     html = html.replace(/ _nonce="4"/g, ` nonce="${nonce4}"`);
+    html = html.replace(/ _nonce="5"/g, ` nonce="${nonce5}"`);
     
     // Clonar response para modificar headers
     const newResponse = new Response(html, response);
@@ -46,7 +48,7 @@ export default {
     const cspHeader = `
       default-src 'self';
       script-src 'nonce-${nonce1}' 'nonce-${nonce2}' 'nonce-${nonce4}' 'strict-dynamic' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://static.cloudflareinsights.com;
-      style-src 'self' https://fonts.googleapis.com;
+      style-src 'self' 'nonce-${nonce5}' https://fonts.googleapis.com;
       img-src 'self' data: https: blob:;
       font-src 'self' data: https://fonts.gstatic.com;
       connect-src 'self' https:;

@@ -18,10 +18,10 @@
   X-Content-Type-Options: nosniff
 
 /**/*.js
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=3600, must-revalidate
 
 /**/*.css
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=3600, must-revalidate
 
 /wallpapers/**
   Cache-Control: public, max-age=2592000, immutable
