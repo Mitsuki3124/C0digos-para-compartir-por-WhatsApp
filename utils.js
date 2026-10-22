@@ -69,7 +69,7 @@ export const ToastSystem = {
         closeBtn.addEventListener('click', () => this.hide(toastId));
         
         // Mostrar con animación
-        setTimeout(() => toast.classList.add('show'), 10);
+        requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('show')));
         
         // Auto-ocultar
         if (duration > 0) {

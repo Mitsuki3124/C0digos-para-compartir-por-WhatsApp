@@ -188,7 +188,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Toast de bienvenida - DIFERIDO para no interferir con la renderización
     setTimeout(() => {
-        ToastSystem.success('¡Todo listo! Explora las plantillas románticas', '¡Bienvenido! 💖');
+        const showWelcome = () => ToastSystem.success('¡Todo listo! Explora las plantillas románticas', '¡Bienvenido! 💖');
+        // Se muestra cuando el navegador está libre (evita una tarea larga justo a los ~2 s)
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(showWelcome, { timeout: 4000 });
+        } else {
+            requestAnimationFrame(() => setTimeout(showWelcome, 0));
+        }
     }, 2000);
 });
 
