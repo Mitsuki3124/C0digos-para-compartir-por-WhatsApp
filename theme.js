@@ -40,7 +40,7 @@ export function crearCoposNieve() {
     
     // Enfocar el primer elemento del menú
     const firstLink = DOM.sidebarMenu.querySelector('a');
-    if (firstLink) firstLink.focus();
+    if (firstLink) requestAnimationFrame(() => firstLink.focus());
 }
 
 export function closeMenu() {
@@ -52,7 +52,7 @@ export function closeMenu() {
     DOM.menuOverlay.setAttribute('aria-hidden', 'true');
     
     // Devolver el foco al botón del menú
-    DOM.menuToggle.focus();
+    requestAnimationFrame(() => DOM.menuToggle.focus());
 }
 
 // ✅ CORRECCIÓN BUG #1: Bloque duplicado de menú eliminado.

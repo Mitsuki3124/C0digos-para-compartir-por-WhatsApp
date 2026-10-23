@@ -225,4 +225,4 @@ html {
         font-size: 1.22em;
     }
 }
-button,input,select,textarea{font-family:inherit}.code-card{content-visibility:auto;contain-intrinsic-size:auto 380px}.wallpaper-card{content-visibility:auto;contain-intrinsic-size:auto 420px}
+button,input,select,textarea{font-family:inherit}.code-card{content-visibility:auto;contain-intrinsic-size:auto 380px}.wallpaper-card{content-visibility:auto;contain-intrinsic-size:auto 420px}.scroll-sentinel{position:absolute;left:0;width:1px;height:1px;pointer-events:none;opacity:0}

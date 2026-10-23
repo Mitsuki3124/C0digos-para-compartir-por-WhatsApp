@@ -77,6 +77,7 @@ export function updateTotalCount() {
 }
 
 // Función para filtrar plantillas - VERSIÓN MEJORADA Y CORREGIDA
+let _firstFilterRun = true; // la primera pasada (carga) no anima las tarjetas
 export function filterTemplates() {
     let visibleCount = 0;
     
@@ -119,7 +120,7 @@ export function filterTemplates() {
             card.classList.remove('hidden');
             visibleCount++;
             // Añadir animación solo si no la tiene
-            if (!card.style.animation) {
+            if (!_firstFilterRun && !card.style.animation) {
                 card.style.animation = 'fadeInUp 0.5s ease';
             }
         } else {
@@ -127,6 +128,7 @@ export function filterTemplates() {
         }
     });
     
+    _firstFilterRun = false;
     // Actualizar estadísticas usando DOM.resultsCount
     DOM.resultsCount.textContent = visibleCount;
     

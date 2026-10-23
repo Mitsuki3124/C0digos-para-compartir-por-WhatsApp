@@ -295,33 +295,39 @@ function setupMainEventListeners() {
         });
     }
     
-    // Scroll effects batched via requestAnimationFrame
-    let scrollTicking = false;
-    window.addEventListener('scroll', () => {
-        if (scrollTicking) return;
-        scrollTicking = true;
-        requestAnimationFrame(() => {
-            const currentScroll = window.scrollY || window.pageYOffset;
+    // Efectos de scroll con IntersectionObserver: no lee scrollY ni fuerza reflows
+    const watchScrollPast = (offset, onChange) => {
+        const sentinel = document.createElement('div');
+        sentinel.className = 'scroll-sentinel';
+        sentinel.setAttribute('aria-hidden', 'true');
+        sentinel.style.top = offset + 'px';
+        document.body.appendChild(sentinel);
+        new IntersectionObserver((entries) => {
+            const entry = entries[entries.length - 1];
+            onChange(entry.boundingClientRect.top < 0);
+        }).observe(sentinel);
+    };
 
-            if (DOM.mainHeader) {
-                if (currentScroll > 100) {
-                    DOM.mainHeader.classList.add('header-scrolled');
-                } else {
-                    DOM.mainHeader.classList.remove('header-scrolled');
-                }
-            }
-
-            if (DOM.backToTop) {
-                if (currentScroll > 300) {
-                    DOM.backToTop.classList.add('show');
-                } else {
-                    DOM.backToTop.classList.remove('show');
-                }
-            }
-
-            scrollTicking = false;
+    if ('IntersectionObserver' in window) {
+        watchScrollPast(100, (past) => {
+            if (DOM.mainHeader) DOM.mainHeader.classList.toggle('header-scrolled', past);
         });
-    }, { passive: true });
+        watchScrollPast(300, (past) => {
+            if (DOM.backToTop) DOM.backToTop.classList.toggle('show', past);
+        });
+    } else {
+        let scrollTicking = false;
+        window.addEventListener('scroll', () => {
+            if (scrollTicking) return;
+            scrollTicking = true;
+            requestAnimationFrame(() => {
+                const currentScroll = window.scrollY || window.pageYOffset;
+                if (DOM.mainHeader) DOM.mainHeader.classList.toggle('header-scrolled', currentScroll > 100);
+                if (DOM.backToTop) DOM.backToTop.classList.toggle('show', currentScroll > 300);
+                scrollTicking = false;
+            });
+        }, { passive: true });
+    }
     
     if (DOM.backToTop) {
         DOM.backToTop.addEventListener('click', () => {
