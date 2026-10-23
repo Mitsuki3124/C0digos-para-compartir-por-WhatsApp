@@ -1,6 +1,6 @@
 name = "c0digos-para-compartir-por-whatsapp"
 type = "javascript"
-main = "src/index.js"
+main = "_worker.js"
 compatibility_date = "2024-12-19"
 
 [env.production]
