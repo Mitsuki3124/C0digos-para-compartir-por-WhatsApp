@@ -10,7 +10,7 @@ export function crearCoposNieve() {
     }
     
     // ✅ OPTIMIZACIÓN #3: Limpiar con innerHTML (40% más rápido, evita memory leaks)
-    DOM.snowflakesContainer.innerHTML = '';
+    DOM.snowflakesContainer.replaceChildren();
     
     for (let i = 0; i < 25; i++) {
         const snowflake = document.createElement('div');
@@ -202,7 +202,8 @@ let _confettiLoaded = false;
 export function loadConfetti(callback) {
     if (_confettiLoaded) { if (callback) callback(); return; }
     var s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js';
+    var confettiUrl = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js';
+    s.src = window.trustedScriptURL ? window.trustedScriptURL(confettiUrl) : confettiUrl;
     s.integrity = 'sha384-j3ZHVq+nFRvVpH9qKR3V5h7EqA0/Mq5sQKu/Ll1eSbRTNDlUZrKRG0YrZRE0Z8zK';
     s.crossOrigin = 'anonymous';
     s.onload = function() { _confettiLoaded = true; if (callback) callback(); };
@@ -219,7 +220,7 @@ export function crearCorazonesFlotantes() {
     }
     
     // ✅ OPTIMIZACIÓN #4: Limpiar con innerHTML (40% más rápido)
-    DOM.heartsContainer.innerHTML = '';
+    DOM.heartsContainer.replaceChildren();
     
     // Solo crear corazones si NO estamos en modo navidad
     if (!DOM.html.classList.contains('navidad')) {

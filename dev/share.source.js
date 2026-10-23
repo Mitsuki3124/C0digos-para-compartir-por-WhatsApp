@@ -175,13 +175,19 @@ export const ModalManager = {
                     }
                     
                     function onCopySuccess() {
-                        var originalText = copyLink.innerHTML;
-                        copyLink.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg> ¡Copiado!';
+                        var originalNodes = Array.from(copyLink.childNodes).map(function (n) { return n.cloneNode(true); });
+                        var svgNS = 'http://www.w3.org/2000/svg';
+                        var checkSvg = document.createElementNS(svgNS, 'svg');
+                        checkSvg.setAttribute('viewBox', '0 0 24 24');
+                        var checkPath = document.createElementNS(svgNS, 'path');
+                        checkPath.setAttribute('d', 'M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z');
+                        checkSvg.appendChild(checkPath);
+                        copyLink.replaceChildren(checkSvg, document.createTextNode(' ¡Copiado!'));
                         copyLink.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
                         ToastSystem.success('El enlace se copió al portapapeles', '¡Enlace copiado!');
                         
                         setTimeout(() => {
-                            copyLink.innerHTML = originalText;
+                            copyLink.replaceChildren(...originalNodes);
                             copyLink.style.background = 'linear-gradient(135deg, var(--accent-color) 0%, #764ba2 100%)';
                         }, 2000);
                     }
@@ -266,7 +272,7 @@ export const ModalManager = {
                 return;
             }
 
-            grid.innerHTML = '';
+            grid.replaceChildren();
             noWallpapers.style.display = 'none';
             grid.style.display = 'grid';
 
@@ -278,9 +284,6 @@ export const ModalManager = {
                 const imagePath     = wallpaperAsset.path;
                 const wallpaperTitle = 'Fondo Romántico ' + i;
                 const fileName       = wallpaperAsset.fileName;
-                const responsiveAttrs = wallpaperAsset.srcset
-                    ? '" data-srcset="' + wallpaperAsset.srcset + '" data-sizes="(max-width: 600px) 480px, (max-width: 1200px) 800px, 1200px'
-                    : '';
 
                 const card = document.createElement('div');
                 card.className = 'wallpaper-card skeleton';
@@ -293,26 +296,36 @@ export const ModalManager = {
                 //    ampliada y el botón "Descargar fondo de pantalla" en la parte inferior.
                 //
                 // ✅ CLICK EN LA IMAGEN Y EN LA TARJETA → también abre el modal
-                card.innerHTML =
-                    '<img data-src="' + imagePath + responsiveAttrs + '"' +
-                        ' alt="' + wallpaperTitle + '"' +
-                        ' class="wallpaper-image"' +
-                        ' loading="lazy"' +
-                        ' decoding="async">' +
-                    '<div class="wallpaper-info">' +
-                        '<div class="wallpaper-title">' + wallpaperTitle + '</div>' +
-                        '<div class="wallpaper-actions">' +
-                            '<a href="' + imagePath + '"' +
-                               ' download="' + fileName + '"' +
-                               ' class="wallpaper-btn wallpaper-download">' +
-                                '📥 Descargar' +
-                            '</a>' +
-                            '<button type="button"' +
-                               ' class="wallpaper-btn wallpaper-view">' +
-                                '👁️ Ver' +
-                            '</button>' +
-                        '</div>' +
-                    '</div>';
+                const cardImg = document.createElement('img');
+                cardImg.setAttribute('data-src', imagePath);
+                if (wallpaperAsset.srcset) {
+                    cardImg.setAttribute('data-srcset', wallpaperAsset.srcset);
+                    cardImg.setAttribute('data-sizes', '(max-width: 600px) 480px, (max-width: 1200px) 800px, 1200px');
+                }
+                cardImg.alt = wallpaperTitle;
+                cardImg.className = 'wallpaper-image';
+                cardImg.loading = 'lazy';
+                cardImg.decoding = 'async';
+
+                const infoEl = document.createElement('div');
+                infoEl.className = 'wallpaper-info';
+                const titleEl = document.createElement('div');
+                titleEl.className = 'wallpaper-title';
+                titleEl.textContent = wallpaperTitle;
+                const actionsEl = document.createElement('div');
+                actionsEl.className = 'wallpaper-actions';
+                const downloadEl = document.createElement('a');
+                downloadEl.href = imagePath;
+                downloadEl.setAttribute('download', fileName);
+                downloadEl.className = 'wallpaper-btn wallpaper-download';
+                downloadEl.textContent = '📥 Descargar';
+                const viewEl = document.createElement('button');
+                viewEl.type = 'button';
+                viewEl.className = 'wallpaper-btn wallpaper-view';
+                viewEl.textContent = '👁️ Ver';
+                actionsEl.append(downloadEl, viewEl);
+                infoEl.append(titleEl, actionsEl);
+                card.append(cardImg, infoEl);
 
                 // Botón VER → abre el modal personalizado
                 const viewBtn = card.querySelector('.wallpaper-view');
@@ -439,11 +452,15 @@ export const ModalManager = {
         // Crear mensaje de error visual
         const errorMsg = document.createElement('div');
         errorMsg.style.cssText = 'text-align: center; padding: 60px 20px; color: var(--text-secondary);';
-        errorMsg.innerHTML = `
-            <div style="font-size: 64px; margin-bottom: 20px;">❌</div>
-            <h3 style="color: var(--text-primary); margin-bottom: 10px;">Imagen no disponible</h3>
-            <p>Este fondo de pantalla no pudo cargarse</p>
-        `;
+        const errIcon = document.createElement('div');
+        errIcon.style.cssText = 'font-size: 64px; margin-bottom: 20px;';
+        errIcon.textContent = '❌';
+        const errTitle = document.createElement('h3');
+        errTitle.style.cssText = 'color: var(--text-primary); margin-bottom: 10px;';
+        errTitle.textContent = 'Imagen no disponible';
+        const errText = document.createElement('p');
+        errText.textContent = 'Este fondo de pantalla no pudo cargarse';
+        errorMsg.append(errIcon, errTitle, errText);
         
         const modalContent = modal.querySelector('.modal-content');
         const existingError = modalContent.querySelector('.error-message');

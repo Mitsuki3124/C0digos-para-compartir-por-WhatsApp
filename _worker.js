@@ -1,5 +1,11 @@
 // Cloudflare Pages (modo avanzado): redirect HTTP->HTTPS, CSP con nonces y headers de seguridad.
 // IMPORTANTE: en Pages este archivo debe llamarse _worker.js y estar en la raíz del sitio.
+// Trusted Types (mitiga XSS basado en DOM). Empieza en modo "solo reportar": no bloquea nada,
+// pero la consola del navegador muestra "[Report Only] ..." si algo (p. ej. AdSense) viola la regla.
+// Cuando la consola salga limpia con los anuncios activos, cambia esto a true para aplicarlo.
+const ENFORCE_TRUSTED_TYPES = false;
+const TRUSTED_TYPES_DIRECTIVE = "require-trusted-types-for 'script'";
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -35,7 +41,7 @@ export default {
     // con nonce, como AdSense, Cloudflare Insights o confetti, quedan permitidos).
     const cspHeader = `
       default-src 'self';
-      script-src 'nonce-${nonce1}' 'nonce-${nonce2}' 'nonce-${nonce4}' 'strict-dynamic' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://static.cloudflareinsights.com;
+      script-src 'nonce-${nonce1}' 'nonce-${nonce2}' 'nonce-${nonce4}' 'strict-dynamic' 'unsafe-inline' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://static.cloudflareinsights.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       img-src 'self' data: https: blob:;
       font-src 'self' data: https://fonts.gstatic.com;
@@ -57,7 +63,12 @@ export default {
     // El HTML lleva nonces distintos en cada petición: no debe servirse desde caché
     headers.set('Cache-Control', 'no-cache');
 
-    headers.set('Content-Security-Policy', cspHeader);
+    if (ENFORCE_TRUSTED_TYPES) {
+      headers.set('Content-Security-Policy', cspHeader + '; ' + TRUSTED_TYPES_DIRECTIVE);
+    } else {
+      headers.set('Content-Security-Policy', cspHeader);
+      headers.set('Content-Security-Policy-Report-Only', cspHeader + '; ' + TRUSTED_TYPES_DIRECTIVE);
+    }
     headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
     headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('X-Frame-Options', 'DENY');

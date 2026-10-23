@@ -1,12 +1,5 @@
 ﻿// SISTEMA DE NOTIFICACIONES TOAST
 
-// Función segura para escapar contenido en toast
-const escapeToastContent = (text) => {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-};
-
 export const ToastSystem = {
     container: null,
     toastCount: 0,
@@ -47,19 +40,36 @@ export const ToastSystem = {
         toast.setAttribute('role', 'alert');
         toast.setAttribute('aria-live', 'assertive');
         
-        // Construir HTML estructura CON contenido directo pero escapado
-        const titleHtml = title ? `<div class="toast-title">${escapeToastContent(title)}</div>` : '';
-        const messageHtml = `<div class="toast-message">${escapeToastContent(message)}</div>`;
-        
-        toast.innerHTML = `
-            <div class="toast-icon">${toastIcon}</div>
-            <div class="toast-content">
-                ${titleHtml}
-                ${messageHtml}
-            </div>
-            <button type="button" class="toast-close" aria-label="Cerrar notificación">×</button>
-            ${duration > 0 ? '<div class="toast-progress"></div>' : ''}
-        `;
+        // Construir la estructura con DOM (textContent): sin innerHTML, sin riesgo de XSS
+        const iconEl = document.createElement('div');
+        iconEl.className = 'toast-icon';
+        iconEl.textContent = toastIcon;
+
+        const contentEl = document.createElement('div');
+        contentEl.className = 'toast-content';
+        if (title) {
+            const titleEl = document.createElement('div');
+            titleEl.className = 'toast-title';
+            titleEl.textContent = title;
+            contentEl.appendChild(titleEl);
+        }
+        const messageEl = document.createElement('div');
+        messageEl.className = 'toast-message';
+        messageEl.textContent = message;
+        contentEl.appendChild(messageEl);
+
+        const closeEl = document.createElement('button');
+        closeEl.type = 'button';
+        closeEl.className = 'toast-close';
+        closeEl.setAttribute('aria-label', 'Cerrar notificación');
+        closeEl.textContent = '×';
+
+        toast.append(iconEl, contentEl, closeEl);
+        if (duration > 0) {
+            const progressEl = document.createElement('div');
+            progressEl.className = 'toast-progress';
+            toast.appendChild(progressEl);
+        }
         
         // Añadir al contenedor
         this.container.appendChild(toast);

@@ -53,6 +53,27 @@
 
 <!-- Google AdSense - Carga diferida para mejorar LCP y caché -->
 <script _nonce="1">
+  // Trusted Types: única política para cargar scripts; solo acepta estas URLs exactas.
+  window.trustedScriptURL = (function () {
+    var allowed = [
+      'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
+      'https://static.cloudflareinsights.com/beacon.min.js',
+      'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js',
+      '/sw.js'
+    ];
+    var policy = null;
+    if (window.trustedTypes && window.trustedTypes.createPolicy) {
+      try {
+        policy = window.trustedTypes.createPolicy('app-scripts', {
+          createScriptURL: function (url) {
+            if (allowed.indexOf(String(url).split('?')[0]) === -1) throw new TypeError('URL de script no permitida: ' + url);
+            return url;
+          }
+        });
+      } catch (e) { policy = null; }
+    }
+    return function (url) { return policy ? policy.createScriptURL(url) : url; };
+  })();
   window.adsenseClient = 'ca-pub-6184121735919156';
   function getCookiePrefs() {
     try {
@@ -92,7 +113,7 @@
     window.adsLoaded = true;
     addAdSensePreconnect();
     var s = document.createElement('script');
-    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + window.adsenseClient;
+    s.src = window.trustedScriptURL('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + window.adsenseClient);
     s.async = true;
     s.crossOrigin = 'anonymous';
     document.head.appendChild(s);
@@ -1305,7 +1326,7 @@ data-search="Pocoyo bailar interactiva compartir amor">
         var s = document.createElement('script');
         s.id = 'cfAnalytics';
         s.defer = true;
-        s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+        s.src = window.trustedScriptURL('https://static.cloudflareinsights.com/beacon.min.js');
         s.setAttribute('data-cf-beacon', '{"token": "898437e768f14653a29983f3798a487f"}');
         document.head.appendChild(s);
     }
@@ -1463,7 +1484,7 @@ data-search="Pocoyo bailar interactiva compartir amor">
   if ('serviceWorker' in navigator) {
     // Usar requestIdleCallback si está disponible, fallback a setTimeout
     const registerSW = () => {
-      navigator.serviceWorker.register('/sw.js').catch(function() {
+      navigator.serviceWorker.register(window.trustedScriptURL('/sw.js')).catch(function() {
         // No bloquear la página si la registración falla
       });
     };

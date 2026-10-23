@@ -80,7 +80,7 @@ function setupNavidadToggle() {
             });
         } else {
             if (DOM.snowflakesContainer) {
-                DOM.snowflakesContainer.innerHTML = '';
+                DOM.snowflakesContainer.replaceChildren();
             }
             crearCorazonesFlotantes();
         }
