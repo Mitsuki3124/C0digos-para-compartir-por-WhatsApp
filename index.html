@@ -49,8 +49,6 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="color-scheme" content="light dark">
 <!-- Preconnect solo a orígenes que se usan al inicio (jsdelivr se carga bajo demanda, no necesita preconnect) -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Cadena de módulos JS: se descargan en paralelo en vez de en cascada (app.js -> demás módulos) -->
 <link rel="modulepreload" href="app.js">
 <link rel="modulepreload" href="utils.js">
@@ -288,20 +286,32 @@ html {
     }}</style>
 <!-- Hoja completa + fuente de emojis estilo Android (Noto Color Emoji): carga sin bloquear el render -->
 <link rel="stylesheet" href="styles.css" id="css-main" media="print">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" id="emoji-font" media="print">
 <script _nonce="1">
 (function () {
-  ['css-main', 'emoji-font'].forEach(function (id) {
-    var l = document.getElementById(id);
-    if (!l) return;
+  var l = document.getElementById('css-main');
+  if (l) {
     var on = function () { l.media = 'all'; };
     if (l.sheet) on(); else l.addEventListener('load', on, { once: true });
-  });
+  }
+  // Noto Color Emoji (estilo Android): Android/iOS/ChromeOS ya traen su fuente de emojis,
+  // así que solo se descarga en PC, y después de la carga para no afectar FCP/LCP.
+  function loadEmojiFont() {
+    if (/Android|iPhone|iPad|iPod|CrOS/i.test(navigator.userAgent)) return;
+    var f = document.createElement('link');
+    f.rel = 'stylesheet';
+    f.href = 'https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap';
+    document.head.appendChild(f);
+  }
+  function schedule() {
+    if ('requestIdleCallback' in window) requestIdleCallback(loadEmojiFont, { timeout: 3000 });
+    else setTimeout(loadEmojiFont, 1500);
+  }
+  if (document.readyState === 'complete') schedule();
+  else window.addEventListener('load', schedule, { once: true });
 })();
 </script>
 <noscript>
 <link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap">
 </noscript>
 
     <link rel="ai-catalog" href="/.well-known/ai-catalog.json" type="application/ai-catalog+json">
