@@ -1,0 +1,14 @@
+{
+  "name": "Mensajes Animados - Códigos HTML de Amor",
+  "short_name": "Mensajes de Amor",
+  "description": "Plantillas HTML románticas gratis para compartir por WhatsApp.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "background_color": "#0f1a14",
+  "theme_color": "#667eea",
+  "icons": [
+    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
