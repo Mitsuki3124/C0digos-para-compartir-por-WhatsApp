@@ -41,7 +41,7 @@ export default {
     // con nonce, como AdSense, Cloudflare Insights o confetti, quedan permitidos).
     const cspHeader = `
       default-src 'self';
-      script-src 'nonce-${nonce1}' 'nonce-${nonce2}' 'nonce-${nonce4}' 'strict-dynamic' 'unsafe-inline' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://static.cloudflareinsights.com;
+      script-src 'nonce-${nonce1}' 'nonce-${nonce2}' 'nonce-${nonce4}' 'strict-dynamic' 'wasm-unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://static.cloudflareinsights.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       img-src 'self' data: https: blob:;
       font-src 'self' data: https://fonts.gstatic.com;
