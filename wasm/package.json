@@ -1,0 +1,17 @@
+{
+  "name": "sitio-wasm",
+  "type": "module",
+  "description": "Funciones Rust compiladas a WebAssembly para el sitio estatico",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "sitio_wasm_bg.wasm",
+    "sitio_wasm.js",
+    "sitio_wasm.d.ts"
+  ],
+  "main": "sitio_wasm.js",
+  "types": "sitio_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
