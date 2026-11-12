@@ -1,0 +1,84 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ---------- Catalogo ARD: validar y sincronizar ----------
+      - name: Validar y sincronizar catalogo ARD
+        run: |
+          node scripts/sync-ard.mjs
+          node scripts/sync-ard.mjs --check
+          node scripts/sync-css.mjs
+          node scripts/sync-css.mjs --check
+
+      # ---------- Rust -> WebAssembly ----------
+      - name: Instalar Rust (+ target wasm)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache de cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Tests de Rust
+        run: cargo test --manifest-path rust/Cargo.toml
+
+      - name: Instalar wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          version: latest
+
+      - name: Compilar a WebAssembly
+        run: |
+          wasm-pack build rust --release --target web --out-dir ../wasm --out-name sitio_wasm
+          rm -f wasm/.gitignore wasm/package.json wasm/README.md
+          ls -lh wasm
+
+      # ---------- Armar el sitio (sin codigo fuente Rust ni target/) ----------
+      - name: Ensamblar _site
+        run: |
+          mkdir _site
+          rsync -a \
+            --exclude='.git' --exclude='.github' --exclude='rust' \
+            --exclude='node_modules' --exclude='_site' --exclude='dev' \
+            --exclude='build-wasm.sh' --exclude='scripts' \
+            ./ _site/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

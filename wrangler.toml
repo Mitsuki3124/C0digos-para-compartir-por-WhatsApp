@@ -11,4 +11,4 @@ routes = [
 [build]
 command = "npm run build"
 cwd = "./"
-watch_paths = ["index.html", "wallpapers/**", "_headers", "robots.txt", "sitemap.xml", "llms.txt", "ai-catalog.json", "ard.json", ".well-known/**", "scripts/**", "_worker.js"]
+watch_paths = ["index.html", "wallpapers/**", "_headers", "robots.txt", "sitemap.xml", "llms.txt", "ai-catalog.json", "ard.json", ".well-known/**", "scripts/**", "_worker.js", "styles.css"]
