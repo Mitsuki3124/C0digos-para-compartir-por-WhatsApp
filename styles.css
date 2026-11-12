@@ -226,3 +226,5 @@ html {
     }
 }
 button,input,select,textarea{font-family:inherit}.code-card{content-visibility:auto;contain-intrinsic-size:auto 380px}.wallpaper-card{content-visibility:auto;contain-intrinsic-size:auto 420px}.scroll-sentinel{position:absolute;left:0;width:1px;height:1px;pointer-events:none;opacity:0}
+/* Render diferido de secciones bajo el hero: menos trabajo antes del primer pintado (LCP) */
+.how-to-section{content-visibility:auto;contain-intrinsic-size:auto 600px}.download{content-visibility:auto;contain-intrinsic-size:auto 500px}footer[role=contentinfo]{content-visibility:auto;contain-intrinsic-size:auto 400px}
