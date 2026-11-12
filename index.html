@@ -55,6 +55,14 @@
 <meta name="color-scheme" content="light dark">
 <!-- Preconnect solo a orígenes que se usan al inicio (jsdelivr se carga bajo demanda, no necesita preconnect) -->
 <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+<!-- Precarga de módulos ES en paralelo: evita la cadena index.html -> app.js -> (utils, dom, ...) -->
+<link rel="modulepreload" href="app.js" _nonce="1">
+<link rel="modulepreload" href="utils.js" _nonce="1">
+<link rel="modulepreload" href="dom.js" _nonce="1">
+<link rel="modulepreload" href="search.js" _nonce="1">
+<link rel="modulepreload" href="favorites.js" _nonce="1">
+<link rel="modulepreload" href="theme.js" _nonce="1">
+<link rel="modulepreload" href="share.js" _nonce="1">
 
 <!-- Google AdSense - Carga diferida para mejorar LCP y caché -->
 <script _nonce="1">
@@ -504,7 +512,9 @@ html {
         font-size: 1.22em;
     }
 }
-button,input,select,textarea{font-family:inherit}.code-card{content-visibility:auto;contain-intrinsic-size:auto 380px}.wallpaper-card{content-visibility:auto;contain-intrinsic-size:auto 420px}.scroll-sentinel{position:absolute;left:0;width:1px;height:1px;pointer-events:none;opacity:0}</style><!--CSS:END-->
+button,input,select,textarea{font-family:inherit}.code-card{content-visibility:auto;contain-intrinsic-size:auto 380px}.wallpaper-card{content-visibility:auto;contain-intrinsic-size:auto 420px}.scroll-sentinel{position:absolute;left:0;width:1px;height:1px;pointer-events:none;opacity:0}
+/* Render diferido de secciones bajo el hero: menos trabajo antes del primer pintado (LCP) */
+.how-to-section{content-visibility:auto;contain-intrinsic-size:auto 600px}.download{content-visibility:auto;contain-intrinsic-size:auto 500px}footer[role=contentinfo]{content-visibility:auto;contain-intrinsic-size:auto 400px}</style><!--CSS:END-->
 <script _nonce="1">
 // Noto Color Emoji (estilo Android): Android/iOS/ChromeOS ya traen su fuente de emojis,
 // así que solo se descarga en PC, y después de la carga para no afectar FCP/LCP.
