@@ -1,14 +1,16 @@
 {
   "name": "c0digos-para-compartir-por-whatsapp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Códigos HTML de Amor - Plantillas Románticas para WhatsApp",
   "author": "THORN ELDRITCH",
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "echo 'Static site - no build needed'",
+    "build": "node scripts/sync-ard.mjs",
     "dev": "wrangler pages dev",
-    "deploy": "wrangler pages deploy ."
+    "deploy": "wrangler pages deploy .",
+    "sync:ard": "node scripts/sync-ard.mjs",
+    "check:ard": "node scripts/sync-ard.mjs --check"
   },
   "devDependencies": {
     "wrangler": "^3.45.0"

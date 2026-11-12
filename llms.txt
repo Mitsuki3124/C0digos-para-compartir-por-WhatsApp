@@ -15,10 +15,11 @@ El sitio aloja más de 37 plantillas HTML interactivas categorizadas en:
 ## Descubrimiento para agentes
 
 El catálogo de capacidades y recursos para agentes de IA está disponible en:
-- `/.well-known/ai-catalog.json` (ruta estándar)
-- `/ai-catalog.json` (alias compatible)
+- `/.well-known/ard.json` (ruta estándar ARD)
+- `/ard.json` (alias sin carpeta oculta)
+- `/.well-known/ai-catalog.json` y `/ai-catalog.json` (rutas heredadas, mismo contenido)
 
-La respuesta se publica como `application/ai-catalog+json` para facilitar la validación y el descubrimiento automatizado.
+Todas las rutas devuelven el mismo catálogo JSON (con CORS abierto) y también se anuncia con `<link rel="ard">` y la cabecera HTTP `Link`.
 
 ## Información del Sitio
 
@@ -66,4 +67,4 @@ El sitio implementa estándares WCAG 2.1 Level AA:
 
 ---
 
-*Última actualización: Julio 2026*
+*Última actualización: Noviembre 2026*

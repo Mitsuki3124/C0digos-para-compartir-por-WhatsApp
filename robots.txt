@@ -5,6 +5,8 @@ User-agent: *
 Allow: /
 Allow: /wallpapers/
 Allow: /sitemap.xml
+Allow: /ard.json
+Allow: /.well-known/ard.json
 Allow: /ai-catalog.json
 Allow: /.well-known/ai-catalog.json
 Allow: /*?q=

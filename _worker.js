@@ -6,6 +6,92 @@
 const ENFORCE_TRUSTED_TYPES = false;
 const TRUSTED_TYPES_DIRECTIVE = "require-trusted-types-for 'script'";
 
+// ---------- Catalogo ARD (descubrimiento para agentes de IA) ----------
+// El Worker sirve el catalogo directamente, sin depender de los archivos estaticos: asi nunca
+// devuelve el index.html (fallback de Pages) en lugar del JSON. Fuente: ai-catalog.json.
+// Para actualizar: edita ai-catalog.json y corre  node scripts/sync-ard.mjs
+// ARD-CATALOG:BEGIN (generado por scripts/sync-ard.mjs - no editar a mano)
+const ARD_CATALOG = {
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Códigos HTML de Amor",
+    "documentationUrl": "https://c0digos-para-compartir-por-whatsapp.pages.dev/"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:c0digos-para-compartir-por-whatsapp.pages.dev:site:romantic-html-library",
+      "displayName": "Biblioteca de plantillas HTML románticas",
+      "type": "text/html",
+      "url": "https://c0digos-para-compartir-por-whatsapp.pages.dev/",
+      "description": "Biblioteca web de plantillas HTML románticas, mensajes animados y tarjetas interactivas para compartir y personalizar.",
+      "tags": [
+        "html",
+        "plantillas",
+        "romántico",
+        "whatsapp",
+        "tarjetas",
+        "mensajes",
+        "frontend"
+      ],
+      "capabilities": [
+        "DiscoverTemplates",
+        "BrowseRomanticHTML",
+        "FindInteractiveMessages",
+        "FindShareableCards"
+      ],
+      "representativeQueries": [
+        "buscar plantillas HTML románticas para WhatsApp",
+        "encontrar tarjetas de amor interactivas",
+        "buscar mensajes HTML animados para compartir"
+      ],
+      "version": "1.0.0",
+      "metadata": {
+        "language": "es",
+        "mobileFriendly": true,
+        "resourceKind": "static-website"
+      },
+      "updatedAt": "2026-11-12T00:00:00Z"
+    },
+    {
+      "identifier": "urn:air:c0digos-para-compartir-por-whatsapp.pages.dev:docs:llms-guide",
+      "displayName": "Guía para agentes y modelos",
+      "type": "text/plain",
+      "url": "https://c0digos-para-compartir-por-whatsapp.pages.dev/llms.txt",
+      "description": "Documento de orientación para agentes de IA y sistemas automatizados que necesiten descubrir y comprender los recursos públicos del sitio.",
+      "tags": [
+        "llms.txt",
+        "ai",
+        "agents",
+        "discovery",
+        "documentation"
+      ],
+      "capabilities": [
+        "ReadSiteDocumentation",
+        "UnderstandSiteResources",
+        "DiscoverPublicResources"
+      ],
+      "representativeQueries": [
+        "qué recursos públicos ofrece este sitio",
+        "cómo descubrir las plantillas disponibles en este sitio"
+      ],
+      "version": "1.0.0",
+      "metadata": {
+        "language": "es",
+        "resourceKind": "llm-guidance"
+      },
+      "updatedAt": "2026-11-12T00:00:00Z"
+    }
+  ]
+};
+// ARD-CATALOG:END
+
+const ARD_PATHS = {
+  '/.well-known/ard.json': 'application/json; charset=utf-8',
+  '/ard.json': 'application/json; charset=utf-8',
+  '/.well-known/ai-catalog.json': 'application/ai-catalog+json; charset=utf-8',
+  '/ai-catalog.json': 'application/ai-catalog+json; charset=utf-8'
+};
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -15,6 +101,10 @@ export default {
       url.protocol = 'https:';
       return Response.redirect(url.toString(), 301);
     }
+
+    // Catalogo ARD: respuesta JSON propia (con CORS abierto para registros y agentes)
+    const ardType = ARD_PATHS[url.pathname];
+    if (ardType) return ardResponse(request, ardType);
 
     // Pasar la petición a los archivos estáticos de Pages
     const response = await env.ASSETS.fetch(request);
@@ -69,6 +159,8 @@ export default {
       headers.set('Content-Security-Policy', cspHeader);
       headers.set('Content-Security-Policy-Report-Only', cspHeader + '; ' + TRUSTED_TYPES_DIRECTIVE);
     }
+    // Descubrimiento ARD por cabecera HTTP
+    headers.append('Link', '</ard.json>; rel="ard"; type="application/json"');
     headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
     headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('X-Frame-Options', 'DENY');
@@ -81,6 +173,26 @@ export default {
     return new Response(html, { status: response.status, statusText: response.statusText, headers });
   }
 };
+
+// Respuesta del catalogo ARD (GET/HEAD/OPTIONS)
+function ardResponse(request, contentType) {
+  const base = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Cross-Origin-Resource-Policy': 'cross-origin',
+    'X-Content-Type-Options': 'nosniff'
+  };
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: base });
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return new Response('Method Not Allowed', { status: 405, headers: { ...base, Allow: 'GET, HEAD, OPTIONS' } });
+  }
+  const body = JSON.stringify(ARD_CATALOG, null, 2) + '\n';
+  return new Response(request.method === 'HEAD' ? null : body, {
+    status: 200,
+    headers: { ...base, 'Content-Type': contentType, 'Cache-Control': 'public, max-age=3600, must-revalidate' }
+  });
+}
 
 // Nonce seguro: 16 bytes aleatorios en base64url
 function generateNonce() {

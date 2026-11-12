@@ -39,6 +39,16 @@
   Cache-Control: public, max-age=86400
   Content-Type: application/xml; charset=utf-8
 
+/ard.json
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=3600, must-revalidate
+  X-Content-Type-Options: nosniff
+
+/.well-known/ard.json
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=3600, must-revalidate
+  X-Content-Type-Options: nosniff
+
 /ai-catalog.json
   Content-Type: application/ai-catalog+json; charset=utf-8
   Cache-Control: public, max-age=3600, must-revalidate
