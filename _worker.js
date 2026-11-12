@@ -1,9 +1,11 @@
 // Cloudflare Pages (modo avanzado): redirect HTTP->HTTPS, CSP con nonces y headers de seguridad.
 // IMPORTANTE: en Pages este archivo debe llamarse _worker.js y estar en la raíz del sitio.
-// Trusted Types (mitiga XSS basado en DOM). Empieza en modo "solo reportar": no bloquea nada,
-// pero la consola del navegador muestra "[Report Only] ..." si algo (p. ej. AdSense) viola la regla.
-// Cuando la consola salga limpia con los anuncios activos, cambia esto a true para aplicarlo.
-const ENFORCE_TRUSTED_TYPES = false;
+// Trusted Types (mitiga XSS basado en DOM): ACTIVO. El Worker envia la directiva
+// "require-trusted-types-for 'script'" en el header Content-Security-Policy.
+// El codigo propio ya es compatible: no usa innerHTML/eval/document.write y toda URL de script
+// (AdSense, Cloudflare Insights, confetti, sw.js) pasa por la politica 'app-scripts' de index.html.
+// Si algun dia hay que volver a solo-reportar, cambia esto a false.
+const ENFORCE_TRUSTED_TYPES = true;
 const TRUSTED_TYPES_DIRECTIVE = "require-trusted-types-for 'script'";
 
 // ---------- Catalogo ARD (descubrimiento para agentes de IA) ----------
@@ -157,7 +159,9 @@ export default {
       headers.set('Content-Security-Policy', cspHeader + '; ' + TRUSTED_TYPES_DIRECTIVE);
     } else {
       headers.set('Content-Security-Policy', cspHeader);
-      headers.set('Content-Security-Policy-Report-Only', cspHeader + '; ' + TRUSTED_TYPES_DIRECTIVE);
+      // upgrade-insecure-requests se ignora (y el navegador avisa en consola) en Report-Only: se quita ahi.
+      const cspReportOnly = cspHeader.replace(/\s*upgrade-insecure-requests;?/, '').replace(/;\s*$/, '');
+      headers.set('Content-Security-Policy-Report-Only', cspReportOnly + '; ' + TRUSTED_TYPES_DIRECTIVE);
     }
     // Descubrimiento ARD por cabecera HTTP
     headers.append('Link', '</ard.json>; rel="ard"; type="application/json"');
